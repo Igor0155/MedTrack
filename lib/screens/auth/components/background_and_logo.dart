@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Widget backgroundAndLogo({required String urlLogo, isMaxHeight = false}) {
+Widget backgroundAndLogo({isMaxHeight = false}) {
   return Builder(builder: (context) {
     return Container(
       width: double.infinity,
@@ -12,16 +12,7 @@ Widget backgroundAndLogo({required String urlLogo, isMaxHeight = false}) {
               : const BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15))),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (urlLogo.isEmpty)
-            CircularProgressIndicator(color: Theme.of(context).colorScheme.onPrimary)
-          else
-            Image.network(urlLogo,
-                height: isMaxHeight ? 50 : 80,
-                loadingBuilder: (context, child, loadingProgress) => loadingProgress == null
-                    ? child
-                    : CircularProgressIndicator(color: Theme.of(context).colorScheme.onPrimary)),
-        ],
+        children: [Image(height: isMaxHeight ? 500 : 200, image: const AssetImage('images/medtrack_logo.png'))],
       ),
     );
   });

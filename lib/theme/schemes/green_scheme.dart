@@ -5,11 +5,11 @@ class BlueScheme {
   static MaterialScheme lightBlueScheme() {
     return const MaterialScheme(
       brightness: Brightness.light,
-      primary: Color(0xFF1677FF), // azul principal
+      primary: Color(0xFF25D366), // azul principal 0xFF1677FF
       onPrimary: Color(0xffFFFFFF),
       secondary: Color(0xfffafafa),
       onSecondary: Color(0xFFFFFFFF),
-      tertiaryFixed: Color(0xff1d4ed8),
+      tertiaryFixed: Color(0xFF128C7E),
       onTertiary: Color(0xFFFFFFFF),
       success: Color(0xFF66BB6A),
       info: Color(0xffE6F4FF),
@@ -27,11 +27,11 @@ class BlueScheme {
   static MaterialScheme darkBlueScheme() {
     return const MaterialScheme(
       brightness: Brightness.dark,
-      primary: Color(0xFF1677FF), // azul principal
+      primary: Color(0xFF25D366), // azul principal
       onPrimary: Color(0xffFFFFFF), // texto escuro em fundo claro
-      secondary: Color(0xff2F333C), // azul forte
+      secondary: Color(0xFF128C7E), // azul forte
       onSecondary: Color(0xffDBDBDB),
-      tertiaryFixed: Color(0xff5671A6),
+      tertiaryFixed: Color(0xFFDCF8C6),
       onTertiary: Color(0xffF7F7F7),
       info: Color(0xffE6F4FF),
       success: Color(0xFF66BB6A),

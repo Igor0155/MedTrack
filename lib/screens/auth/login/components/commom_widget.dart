@@ -10,7 +10,6 @@ Widget commomWidget(
         child: Container(
             constraints: fixedSizedAndMaxHeight ? null : BoxConstraints(minHeight: MediaQuery.of(context).size.height),
             height: fixedSizedAndMaxHeight ? MediaQuery.of(context).size.height : null,
-            child: Stack(
-                children: [backgroundAndLogo(urlLogo: logoUrl ?? '', isMaxHeight: fixedSizedAndMaxHeight), child])));
+            child: Stack(children: [backgroundAndLogo(isMaxHeight: fixedSizedAndMaxHeight), child])));
   });
 }
