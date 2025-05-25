@@ -18,7 +18,7 @@ class InputLoginDto {
   }
 
   StringValidationCallback isValidLogin() {
-    return FormValidationBuilder().loginCelula().build();
+    return FormValidationBuilder().required().build();
   }
 
   StringValidationCallback isValidPassword() {
@@ -27,16 +27,12 @@ class InputLoginDto {
 }
 
 class OutputLoginDto {
-  final bool changePasswordNextLogin;
   final String token;
 
-  OutputLoginDto({required this.token, required this.changePasswordNextLogin});
+  OutputLoginDto({required this.token});
 
   factory OutputLoginDto.fromJson(Map<String, dynamic> json) {
-    return OutputLoginDto(
-      token: json['token'],
-      changePasswordNextLogin: json['change_password_next_login'],
-    );
+    return OutputLoginDto(token: json['token']);
   }
 
   bool isValid() {

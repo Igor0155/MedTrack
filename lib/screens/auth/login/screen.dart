@@ -51,42 +51,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       var result = await service.loginServiceExecute(inputLoginDto);
 
       if (!context.mounted) return;
+
       // Adicionando o token no authProvider
       ref.read(authProvider.notifier).login(result.token);
-
-      final authState = ref.watch(authProvider);
-      // adicionando as permissoes no D3Can
-      // ref
-      //     .read(d3CanProvider.notifier)
-      //     .addAllPermissions(authState.infoToken?.permissions ?? []);
-
-      // Salvando o nome do usuário no local storage
-      await service.loginController.assignUsernameIfLocalDataExists(authState.infoToken?.name ?? '');
-
-      if (!context.mounted) return;
       // validações
-      if (result.changePasswordNextLogin != true) {
-        if (authState.isAuthenticated) {
-          if (authState.infoToken!.type == "CTM") {
-            context.replace('/home');
-          } else {
-            context.showSnackBarInfo(
-                'Você está logando com um usuário de ${authState.infoToken!.type == 'CPN' ? 'empresa' : authState.infoToken!.type == 'SYS' ? 'administrador do sistema' : 'grupo de cliente'}.',
-                const Duration(seconds: 10));
-            if (authState.infoToken!.type == 'CGR') {
-              context.replace('/select_customer');
-            } else {
-              context.replace('/select_company');
-            }
-          }
-        } else {
-          context.showSnackBarError('Você não está autenticado. Contate a TI');
-        }
-      } else {
-        context.showSnackBarInfo(
-            'Detectamos o uso de uma senha padrão em sua conta. Para garantir a sua segurança, é essencial estabelecer uma nova senha pessoal e única.');
-        context.replace('/auth_change_password', extra: inputLoginDto);
-      }
+
+      context.replace('/home');
     } on Exception catch (e) {
       service.authConfigState.setLoading(false);
       if (!context.mounted) return;

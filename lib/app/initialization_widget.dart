@@ -1,7 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:meditrack/app/app_meditrack.dart';
+import 'package:meditrack/firebase_options.dart';
 import 'package:meditrack/shared/helpers/device_type.dart';
 import 'package:meditrack/shared/stores/theme_mode_app.dart';
 
@@ -22,6 +24,10 @@ class InitializationWidget extends ConsumerWidget {
 
       // Inicializando o ThemeMode
       await theme.init();
+
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
 
       // Inicia o aplicativo principal
       runApp(const ProviderScope(child: MediTrack()));

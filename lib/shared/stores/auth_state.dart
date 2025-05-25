@@ -1,6 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:meditrack/shared/helpers/convert_token_string_to_info_token.dart';
-import 'package:meditrack/shared/types/info_token_type.dart';
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   return AuthNotifier();
@@ -8,32 +6,23 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
 
 class AuthState {
   final bool isAuthenticated;
-  final InfoToken? infoToken;
-  AuthState({this.isAuthenticated = false, this.infoToken});
+  AuthState({this.isAuthenticated = false});
 }
 
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier() : super(AuthState(isAuthenticated: false, infoToken: null));
+  AuthNotifier() : super(AuthState(isAuthenticated: false));
 
   void login(String token) {
-    var infoToken = convertTokenStringToInfoToken(token);
-    if (infoToken == null) {
-      return;
-    }
-    state = AuthState(isAuthenticated: true, infoToken: infoToken);
+    state = AuthState(isAuthenticated: true);
   }
 
   void logout() {
-    state = AuthState(isAuthenticated: false, infoToken: null);
+    state = AuthState(isAuthenticated: false);
   }
 
   void changeToken(String token) {
-    state = AuthState(isAuthenticated: false, infoToken: null);
+    state = AuthState(isAuthenticated: false);
 
-    var infoToken = convertTokenStringToInfoToken(token);
-    if (infoToken == null) {
-      return;
-    }
-    state = AuthState(isAuthenticated: true, infoToken: infoToken);
+    state = AuthState(isAuthenticated: true);
   }
 }

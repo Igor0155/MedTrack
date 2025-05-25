@@ -1,40 +1,35 @@
-import 'package:meditrack/shared/services/client_http_interface.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:meditrack/screens/auth/login/type.dart';
 import 'package:meditrack/shared/services/client_shared_preferences_interface.dart';
 import 'package:meditrack/shared/types/exception_type.dart';
 import 'package:meditrack/shared/types/local_user_credentials.dart';
 
 class LoginController {
-  final IClientHttp _clientHttp;
   final IClientSharedPreferences _clientSharedPreferences;
 
-  LoginController(this._clientHttp, this._clientSharedPreferences);
+  LoginController(this._clientSharedPreferences);
 
   // função para realizar o login e salvar o token e os dados de login(caso o usuário deseje) no localStorage
   Future<OutputLoginDto> login(InputLoginDto input) async {
-    // limpa o token do localStorage
-    await _clientSharedPreferences.clean("token");
-    ClientHttpResponse response = await _clientHttp.post("/api/v1/auth/login", input.toJson());
-    if (response.isSuccess) {
-      final result = OutputLoginDto.fromJson(response.data);
-      // verifica se o token é válido
-      if (result.isValid()) {
-        // salva o token no localStorage
-        await _clientSharedPreferences.set("token", result.token);
-        // verifica se o usuário deseja salvar os dados de login
-        if (input.isSaveInputLogin) {
-          // salva os dados de login no localStorage
-          final credentials = LocalUserCredentials(u: input.login, p: input.password, n: '');
-          await _clientSharedPreferences.set("il", credentials.toJson());
-        } else {
-          // limpa os dados de login do localStorage
-          await _clientSharedPreferences.clean("il");
-        }
-        return result;
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: input.login,
+        password: input.password,
+      );
+
+      var token = await FirebaseAuth.instance.currentUser?.getIdToken();
+
+      await _clientSharedPreferences.set("token", token);
+
+      if (input.isSaveInputLogin) {
+        final credentials = LocalUserCredentials(u: input.login, p: input.password, n: input.login.split('@')[0]);
+        await _clientSharedPreferences.set("il", credentials.toJson());
+      } else {
+        await _clientSharedPreferences.clean("il");
       }
-      throw MediTrackException('Token Vazio');
-    } else {
-      throw MediTrackException(response.data['message']);
+      return OutputLoginDto(token: token ?? '');
+    } on FirebaseAuthException catch (e) {
+      throw MediTrackException(e.message ?? 'Erro desconhecido no login Firebase');
     }
   }
 
