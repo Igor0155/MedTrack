@@ -1,0 +1,56 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+TextFormField d3TextFormField({
+  Key? key,
+  required String labelText,
+  TextEditingController? controller,
+  Function(PointerDownEvent)? onTapOutside,
+  Function(String)? onFieldSubmitted,
+  Function(String)? onChanged,
+  void Function(String?)? onSaved,
+  List<TextInputFormatter>? inputFormatters,
+  bool obscureText = false,
+  int? maxLength,
+  String? initialValue,
+  String? helperText,
+  TextInputType? keyboardType,
+  Widget? Function(BuildContext, {required int currentLength, required bool isFocused, required int? maxLength})?
+      buildCounter,
+  Widget? suffixIcon,
+  bool? readOnly,
+  int? maxLines = 1,
+  bool autofocus = false,
+  bool enabled = true,
+  String? Function(String?)? validator,
+}) {
+  return TextFormField(
+    key: key,
+    autofocus: autofocus,
+    initialValue: initialValue,
+    controller: controller,
+    onChanged: onChanged,
+    onSaved: onSaved,
+    onTapOutside: onTapOutside,
+    onFieldSubmitted: onFieldSubmitted,
+    keyboardType: keyboardType,
+    inputFormatters: inputFormatters,
+    maxLength: maxLength,
+    buildCounter: buildCounter,
+    keyboardAppearance: Brightness.dark,
+    readOnly: readOnly ?? false,
+    obscureText: obscureText,
+    maxLines: maxLines,
+    decoration: InputDecoration(
+      enabled: enabled,
+      suffixIcon: suffixIcon,
+      labelStyle: const TextStyle(fontSize: 14),
+      labelText: labelText,
+      helperText: helperText,
+      hintStyle: const TextStyle(fontSize: 13),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+    ),
+    style: const TextStyle(fontSize: 14),
+    validator: validator,
+  );
+}
