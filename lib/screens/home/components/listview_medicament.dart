@@ -132,7 +132,7 @@ class _ListViewWorkspaceState extends ConsumerState<ListViewMedicament> {
                             const SizedBox(height: 8),
                             Row(
                               children: [
-                                Text(children.fabricator, style: const TextStyle(fontSize: 12)),
+                                Text(children.formaFarm, style: const TextStyle(fontSize: 12)),
                               ],
                             ),
                           ],
