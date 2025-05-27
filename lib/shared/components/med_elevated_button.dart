@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meditrack/theme/utils/app_colors.dart';
 
-class D3ElevatedButton {
+class MedElevatedButton {
   static Widget primary({
     required String label,
     void Function()? onPressed,

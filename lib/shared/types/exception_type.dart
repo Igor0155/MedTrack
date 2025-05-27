@@ -1,7 +1,7 @@
-class MediTrackException implements Exception {
+class MedTrackException implements Exception {
   final String message;
 
-  MediTrackException(this.message);
+  MedTrackException(this.message);
 
   @override
   String toString() {

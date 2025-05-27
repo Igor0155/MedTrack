@@ -29,7 +29,7 @@ class LoginController {
       }
       return OutputLoginDto(token: token ?? '');
     } on FirebaseAuthException catch (e) {
-      throw MediTrackException(e.message ?? 'Erro desconhecido no login Firebase');
+      throw MedTrackException(e.message ?? 'Erro desconhecido no login Firebase');
     }
   }
 

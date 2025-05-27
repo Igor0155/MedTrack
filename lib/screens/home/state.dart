@@ -8,7 +8,7 @@ class MedicamentStateNotifier extends ChangeNotifier {
   List<Medicament> _list = [];
   List<Medicament> get list => _list;
   var isLoading = true;
-  var isGEDocsException = false;
+  var isMedException = false;
 
   MedicamentStateNotifier() {
     _service.listarMedicamentos().listen((meds) {

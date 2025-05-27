@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meditrack/main.dart';
 import 'package:meditrack/screens/auth/login/type.dart';
-import 'package:meditrack/shared/components/d3_elevated_button.dart';
+import 'package:meditrack/shared/components/med_elevated_button.dart';
 
 class AutoLogin extends StatefulWidget {
   final void Function() onPressedButtonAccess;
@@ -49,7 +49,7 @@ class _AutoLoginState extends State<AutoLogin> {
                             child: Text('Login: ${widget.inputLoginDto.login}',
                                 overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14))),
                       ),
-                      D3ElevatedButton.primaryOutline(
+                      MedElevatedButton.primaryOutline(
                           elevation: 0,
                           label: 'Alterar',
                           onPressed: widget.onPressedButtonChange,
@@ -60,7 +60,7 @@ class _AutoLoginState extends State<AutoLogin> {
                   const SizedBox(height: 20),
                   SizedBox(
                       width: double.infinity,
-                      child: D3ElevatedButton.primaryOutline(
+                      child: MedElevatedButton.primaryOutline(
                           elevation: 0,
                           color: Theme.of(context).colorScheme.onSurface,
                           label: 'Acessar',

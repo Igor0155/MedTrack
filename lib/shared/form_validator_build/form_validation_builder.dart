@@ -107,13 +107,6 @@ extension CustomValidationBuild on FormValidationBuilder {
     return add((value) => value != valueToCompare ? message ?? 'O campo não pode ser diferente' : null);
   }
 
-  FormValidationBuilder loginCelula([String? message]) {
-    return add((value) {
-      final loginRegex = RegExp(r'^[0-9]+[._-][^\s]{3,}$');
-      return value != null && !loginRegex.hasMatch(value) ? message ?? 'Login inválido' : null;
-    });
-  }
-
   FormValidationBuilder notSmallerDate(DateTime valueToCompareDateOriginal, [String? message]) {
     return add((value) {
       DateTime? expurgeDate = FormatDate().formatStringForDateTime(value!);

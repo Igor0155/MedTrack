@@ -23,7 +23,7 @@ class AuthConfigState extends ChangeNotifier {
   IClientSharedPreferences? clientSharedPreferences;
 
   bool isLoading = true;
-  bool isGEDocsException = false;
+  bool isMedException = false;
 
   bool containsLoginSaved = false;
 

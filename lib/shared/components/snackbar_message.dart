@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-extension D3SnackbarMessage on BuildContext {
+extension MedSnackbarMessage on BuildContext {
   Duration get duration => const Duration(seconds: 2);
   bool get showCloseIcon => true;
 

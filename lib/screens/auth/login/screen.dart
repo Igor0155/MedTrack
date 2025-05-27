@@ -167,7 +167,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           padding: const EdgeInsets.only(bottom: 16, top: 30),
                           alignment: Alignment.center,
                           child:
-                              Text('© Tecnologia CélulaTech', style: TextStyle(color: Colors.grey[700], fontSize: 15)),
+                              Text('© Tecnologia MediTrack', style: TextStyle(color: Colors.grey[700], fontSize: 15)),
                         ),
                       ],
                     ),

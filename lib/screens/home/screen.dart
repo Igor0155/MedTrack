@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:meditrack/main.dart';
 import 'package:meditrack/screens/home/components/drawer/screen.dart';
 import 'package:meditrack/screens/home/components/listview_medicament.dart';
@@ -76,9 +77,9 @@ class _HomeAppState extends ConsumerState<HomeApp> {
                             if (state.list.isEmpty && state.isLoading) {
                               changeItemCount(isShowCountItems: false);
                               return const Center(child: CircularProgressIndicator());
-                            } else if (state.isGEDocsException) {
+                            } else if (state.isMedException) {
                               changeItemCount(isShowCountItems: false);
-                              return SizedBox(); //warning(label: state.gedocsExceptionMessage, fun: () async {});
+                              return const SizedBox(); //warning(label: state.gedocsExceptionMessage, fun: () async {});
                             } else if (state.list.isEmpty) {
                               changeItemCount(isShowCountItems: false);
                               return noData(icon: 'empty');
@@ -89,7 +90,7 @@ class _HomeAppState extends ConsumerState<HomeApp> {
                                 color: Theme.of(context).colorScheme.surface,
                                 child: Padding(
                                   padding: EdgeInsets.symmetric(horizontal: isTablet ? 20 : 10),
-                                  child: Row(
+                                  child: const Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       // selectLayout(
@@ -163,7 +164,7 @@ class _HomeAppState extends ConsumerState<HomeApp> {
             child: ListenableBuilder(
                 listenable: state,
                 builder: (context, _) {
-                  if (state.isLoading || state.isGEDocsException) {
+                  if (state.isLoading || state.isMedException) {
                     return const SizedBox();
                   } else {
                     return SizedBox(
@@ -172,7 +173,8 @@ class _HomeAppState extends ConsumerState<HomeApp> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           extendedPadding: const EdgeInsets.all(12),
                           onPressed: () async {
-                            // var result = await modalFloatActionButton.primaryModal(context, state);
+                            context.push('/add_medicament');
+                            //  var result = await modalFloatActionButton.primaryModal(context, state);
                           },
                           label: const Text('Novo'),
                           icon: const Icon(Icons.add)),
