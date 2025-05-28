@@ -173,7 +173,7 @@ class _HomeAppState extends ConsumerState<HomeApp> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           extendedPadding: const EdgeInsets.all(12),
                           onPressed: () async {
-                            context.push('/add_medicament');
+                            context.push('/add_medicament', extra: state);
                             //  var result = await modalFloatActionButton.primaryModal(context, state);
                           },
                           label: const Text('Novo'),

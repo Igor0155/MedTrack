@@ -14,7 +14,7 @@ DropdownButtonFormField medDropdownButtonFormField({
   return DropdownButtonFormField<String>(
     key: key,
     value: value,
-    menuMaxHeight: 200,
+    menuMaxHeight: 300,
     decoration: InputDecoration(
       enabled: enabled,
       contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),

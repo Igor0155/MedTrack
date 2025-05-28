@@ -3,6 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditrack/shared/components/med_elevated_button.dart';
 
+class ItemSelect<T> {
+  List selected;
+  T? item;
+  ItemSelect({required this.selected, required this.item});
+}
+
 class MedDropDownSelectItems<T> extends StatefulWidget {
   final Key? keyFormField;
   final bool isMultiSelect;
@@ -14,7 +20,12 @@ class MedDropDownSelectItems<T> extends StatefulWidget {
   final dynamic Function(T item) getKey;
   final Widget Function(T item)? getLeadingIcon;
   final String? Function(String?)? validator;
-  final ValueChanged<List>? onItemSelected;
+  final ValueChanged<ItemSelect<T>>? onItemSelected;
+
+  /// Função opcional para buscar dados remotamente ao pesquisar.
+  /// Recebe o texto pesquisado e deve retornar uma lista de itens do tipo T.
+  final Future<List<T>> Function(String searchText)? onSearchRemote;
+
   final TextOverflow? overflow;
 
   const MedDropDownSelectItems({
@@ -30,6 +41,7 @@ class MedDropDownSelectItems<T> extends StatefulWidget {
     required this.getKey,
     this.validator,
     this.getLeadingIcon,
+    this.onSearchRemote,
     this.overflow = TextOverflow.ellipsis,
   });
 
@@ -94,23 +106,26 @@ class _MedDropDownSelectItemsState<T> extends State<MedDropDownSelectItems<T>> {
             getKey: widget.getKey,
             getLeadingIcon: widget.getLeadingIcon,
             overflow: widget.overflow,
-            onItemsSelected: (selected) {
+            onSearchRemote: widget.onSearchRemote,
+            onItemsSelected: (iObject) {
               setState(() {
                 // lista de itens selecionados recebe a nova lista de itens selecionados
-                selectedItems = selected;
+                selectedItems = iObject.selected;
               });
               // caso for selecão unica
               if (!widget.isMultiSelect) {
                 // verifica se o item selecionado nao esta nulo
                 if (widget.onItemSelected != null) {
-                  widget.onItemSelected!(selected);
+                  widget.onItemSelected!(iObject);
                 }
-                if (selected.isNotEmpty) {
+                if (iObject.selected.isNotEmpty) {
                   // verifica se a key do item selecionado é igual a key do item da lista
-                  final selectedKey = selected.first;
+
+                  final selectedKey = iObject.selected.first;
+
                   final selectedItem = widget.list.firstWhere(
                     (item) => widget.getKey(item) == selectedKey,
-                    orElse: () => null as T,
+                    orElse: () => iObject.item as T,
                   );
                   // se for diferente de nulo o controller recebe o label do item selecionado
                   if (selectedItem != null) {
@@ -125,7 +140,7 @@ class _MedDropDownSelectItemsState<T> extends State<MedDropDownSelectItems<T>> {
               } else {
                 controller.text = '';
                 if (widget.onItemSelected != null) {
-                  widget.onItemSelected!(selected);
+                  widget.onItemSelected!(iObject);
                 }
               }
             },
@@ -172,12 +187,13 @@ class _MedDropDownList<T> extends StatefulWidget {
   final String label;
   final List<T> list;
   final bool isMultiSelect;
-  final ValueChanged<List>? onItemsSelected;
+  final ValueChanged<ItemSelect<T>>? onItemsSelected;
   final List selectedItems;
   final String Function(T item) getLabel;
   final dynamic Function(T item) getKey;
   final Widget Function(T item)? getLeadingIcon;
   final TextOverflow? overflow;
+  final Future<List<T>> Function(String searchText)? onSearchRemote;
 
   const _MedDropDownList({
     required this.label,
@@ -189,6 +205,7 @@ class _MedDropDownList<T> extends StatefulWidget {
     required this.getKey,
     required this.getLeadingIcon,
     required this.overflow,
+    required this.onSearchRemote,
   });
 
   @override
@@ -211,7 +228,7 @@ class _MedDropDownListState<T> extends State<_MedDropDownList<T>> {
   }
 
   // buscar o texto dentro da lista de opções
-  void onSearchTextChanged(String searchText) {
+  void onSearchTextChanged(String searchText) async {
     if (filterController.text.isEmpty) {
       setState(() {
         isInitSearch = false;
@@ -223,15 +240,21 @@ class _MedDropDownListState<T> extends State<_MedDropDownList<T>> {
     }
 
     if (debounce?.isActive ?? false) debounce?.cancel();
-    // verificar para não fazer chamada toda hora
-    debounce = Timer(duration, () {
+
+    debounce = Timer(duration, () async {
       if (searchText.isEmpty) {
         setState(() {
           filteredOptions = widget.list;
         });
+      } else if (widget.onSearchRemote != null) {
+        // Busca remota
+        final remoteResults = await widget.onSearchRemote!(searchText);
+        setState(() {
+          filteredOptions = remoteResults;
+        });
       } else {
+        // Busca local
         searchText = searchText.toLowerCase();
-
         List<T> newList = widget.list.where((objData) {
           return widget.getLabel(objData).toLowerCase().contains(searchText);
         }).toList();
@@ -258,7 +281,7 @@ class _MedDropDownListState<T> extends State<_MedDropDownList<T>> {
                       child: SizedBox(width: 30, child: Divider(thickness: 3, height: 5))),
                   ListTile(
                       enabled: false,
-                      title: Text(widget.label.isEmpty ? 'Selecine' : widget.label,
+                      title: Text(widget.label.isEmpty ? 'Selecione' : widget.label,
                           style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                           overflow: TextOverflow.clip)),
                   Padding(
@@ -282,7 +305,7 @@ class _MedDropDownListState<T> extends State<_MedDropDownList<T>> {
                               label: 'Desmarcar Todos',
                               onPressed: () async {
                                 widget.selectedItems.clear();
-                                widget.onItemsSelected!(widget.selectedItems);
+                                widget.onItemsSelected!(ItemSelect(selected: widget.selectedItems, item: null));
                                 setState(() {});
                               },
                               visualDensity: VisualDensity.compact),
@@ -296,7 +319,7 @@ class _MedDropDownListState<T> extends State<_MedDropDownList<T>> {
                                       for (var element in widget.list) {
                                         widget.selectedItems.add(widget.getKey(element));
                                       }
-                                      widget.onItemsSelected!(widget.selectedItems);
+                                      widget.onItemsSelected!(ItemSelect(selected: widget.selectedItems, item: null));
                                       setState(() {});
                                     }),
                         ],
@@ -333,7 +356,7 @@ class _MedDropDownListState<T> extends State<_MedDropDownList<T>> {
                             }
                             //  retorna caso nao seja nulo
                             if (widget.onItemsSelected != null) {
-                              widget.onItemsSelected!(widget.selectedItems);
+                              widget.onItemsSelected!(ItemSelect(selected: widget.selectedItems, item: item));
                             }
                           } else {
                             if (isSelected) {
@@ -345,7 +368,9 @@ class _MedDropDownListState<T> extends State<_MedDropDownList<T>> {
                             }
 
                             if (widget.onItemsSelected != null) {
-                              widget.onItemsSelected!(widget.selectedItems); // Chama o callback com a lista atualizada
+                              widget.onItemsSelected!(ItemSelect(
+                                  selected: widget.selectedItems,
+                                  item: item)); // Chama o callback com a lista atualizada
                             }
                           }
                           setState(() {});

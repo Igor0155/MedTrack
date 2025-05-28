@@ -48,14 +48,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> loginAnValidateUserPermissions(BuildContext context) async {
     try {
       // Chama o endpoint de login e retorna o token
-      var result = await service.loginServiceExecute(inputLoginDto);
+      await service.loginServiceExecute(inputLoginDto);
 
       if (!context.mounted) return;
 
       // Adicionando o token no authProvider
-      ref.read(authProvider.notifier).login(result.token);
-      // validações
+      ref.read(authProvider.notifier).login();
 
+      // validações
       context.replace('/home');
     } on Exception catch (e) {
       service.authConfigState.setLoading(false);

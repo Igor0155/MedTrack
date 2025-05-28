@@ -1,43 +1,53 @@
-class Medicament {
+import 'package:meditrack/shared/form_validator_build/form_validation_builder.dart';
+
+class MedicamentRepositoryFire {
+  String authorUid;
   String id;
-  String name;
+  String medicineName;
+  int medicineId;
   String dosage;
   String formaFarm;
-  String quantity;
   String duration;
   String description;
 
-  Medicament({
+  MedicamentRepositoryFire({
+    required this.authorUid,
     required this.id,
-    required this.name,
+    required this.medicineName,
+    required this.medicineId,
     required this.dosage,
     required this.formaFarm,
-    required this.quantity,
     required this.duration,
     required this.description,
   });
 
-  factory Medicament.fromJson(Map<String, dynamic> json, String documentId) {
-    return Medicament(
+  factory MedicamentRepositoryFire.fromJson(Map<String, dynamic> json, String documentId) {
+    return MedicamentRepositoryFire(
+      authorUid: json['author_uid'] ?? '',
       id: documentId,
-      name: json['name'] ?? '',
+      medicineName: json['name'] ?? '',
+      medicineId: json['medicineId'] ?? '',
       dosage: json['dosage'] ?? '',
       formaFarm: json['formaFarm'] ?? '',
-      quantity: json['quantity'] ?? '',
       duration: json['duration'] ?? '',
       description: json['description'] ?? '',
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson(String authorUid) {
     return {
-      'name': name,
+      'author_uid': authorUid,
+      'name': medicineName,
+      'medicineId': medicineId,
       'dosage': dosage,
       'formaFarm': formaFarm,
-      'quantity': quantity,
       'duration': duration,
       'description': description,
     };
+  }
+
+  StringValidationCallback isRequired() {
+    return FormValidationBuilder().required().build();
   }
 }
 

@@ -114,12 +114,13 @@ class _ListViewWorkspaceState extends ConsumerState<ListViewMedicament> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(children.name,
+                            Text(children.medicineName,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 8),
                             Row(children: [
-                              Text(children.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                              Text(children.medicineName,
+                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                               // children.type == OutputType.fle
                               //     ? Row(children: [
                               //         const SizedBox(width: 8),

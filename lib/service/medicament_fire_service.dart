@@ -1,23 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:meditrack/screens/home/type/medicament.dart';
 
 class MedicamentFireService {
   final CollectionReference _medicamentRef = FirebaseFirestore.instance.collection('medicine');
+  final _user = FirebaseAuth.instance.currentUser;
 
-  Future<void> adicionarMedicamento(Medicament medicamento) {
-    return _medicamentRef.add(medicamento.toJson());
+  Future<void> adicionarMedicamento(MedicamentRepositoryFire medicamento) async {
+    await _medicamentRef.add(medicamento.toJson(_user?.uid ?? ''));
+    return;
   }
 
-  Stream<List<Medicament>> listarMedicamentos() {
+  Stream<List<MedicamentRepositoryFire>> listarMedicamentos() {
     return _medicamentRef.snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
-        return Medicament.fromJson(doc.data() as Map<String, dynamic>, doc.id);
+        return MedicamentRepositoryFire.fromJson(doc.data() as Map<String, dynamic>, doc.id);
       }).toList();
     });
   }
 
-  Future<void> atualizarMedicamento(Medicament medicamento) {
-    return _medicamentRef.doc(medicamento.id).update(medicamento.toJson());
+  Future<void> atualizarMedicamento(MedicamentRepositoryFire medicamento) {
+    return _medicamentRef.doc(medicamento.id).update(medicamento.toJson(_user?.uid ?? ''));
   }
 
   Future<void> deletarMedicamento(String id) {

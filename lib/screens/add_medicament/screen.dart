@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:meditrack/main.dart';
 import 'package:meditrack/screens/add_medicament/state.dart';
 import 'package:meditrack/screens/add_medicament/type.dart';
+import 'package:meditrack/screens/home/state.dart';
 import 'package:meditrack/screens/home/type/medicament.dart';
 import 'package:meditrack/shared/components/drop_down_button_formfield.dart';
 import 'package:meditrack/shared/components/drop_down_select.dart';
@@ -14,53 +16,52 @@ import 'package:meditrack/shared/components/picker_calendar.dart';
 import 'package:meditrack/shared/components/snackbar_message.dart';
 import 'package:meditrack/shared/components/text_form_field.dart';
 import 'package:meditrack/shared/components/warning.dart';
+import 'package:meditrack/shared/extensions/to_title_case.dart';
 import 'package:meditrack/shared/helpers/format_date.dart';
 import 'package:meditrack/shared/services/client_http_interface.dart';
+import 'package:meditrack/shared/services/dio_client_medicine.dart';
 import 'package:meditrack/shared/types/exception_type.dart';
+import 'package:meditrack/shared/types/medicines.dart';
 
-class AddMedicament extends StatefulWidget {
-  const AddMedicament({super.key});
+class CreateMedicine extends StatefulWidget {
+  final MedicamentStateNotifier stateFire;
+  const CreateMedicine({super.key, required this.stateFire});
 
   @override
-  State<AddMedicament> createState() => _AddMedicamentState();
+  State<CreateMedicine> createState() => _CreateMedicineState();
 }
 
-class _AddMedicamentState extends State<AddMedicament> {
+class _CreateMedicineState extends State<CreateMedicine> {
   final originalDate = TextEditingController();
   final expectedPurgeDate = TextEditingController();
   final formatDate = FormatDate();
   final pickerCalendar = PickerCalendar();
-  final state = AddMedicamentState(client: getIt.get<IClientHttp>());
-
+  final state = AddMedicamentState(client: getIt.get<IClientHttp>(), clientMedicine: getIt.get<DioClientMedicine>());
+  final _listPharmaceuticalForm = [
+    PharmaceuticalForm(key: 'CMP', label: 'Comprimido'),
+    PharmaceuticalForm(key: 'CAP', label: 'Cápsula'),
+    PharmaceuticalForm(key: 'SOL', label: 'Solução Oral'),
+    PharmaceuticalForm(key: 'INJ', label: 'Injetável'),
+    PharmaceuticalForm(key: 'OUT', label: 'Outro'),
+  ]; // Forma farmacêutica (comprimido, cápsula, solução oral, injetável etc.)
   final _formKey = GlobalKey<FormState>();
-  final input = Medicament(name: '', description: '', dosage: '', duration: '', formaFarm: '', quantity: '', id: '');
-  List<String> selectedMarkersCuids = [];
-  bool isFirstListMarkers = true;
-  bool isFirstOriginalDate = true;
-  bool isFirstExpectedPurgeDate = true;
+  final input = MedicamentRepositoryFire(
+      authorUid: "", medicineId: 0, medicineName: '', description: '', dosage: '', duration: '', formaFarm: '', id: '');
 
   @override
   void initState() {
     super.initState();
     scheduleMicrotask(() async {
-      try {
-        if (mounted) await state.searchMedicaments();
-      } on Exception catch (e) {
-        if (!mounted) return;
-        context.showSnackBarError(e.toString());
-      }
+      if (mounted) await state.loadMedicaments();
     });
   }
 
-  Future<bool> _formUpdateSubmit() async {
+  Future<bool> _formCreateSubmit() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      // var result = await state.update(widget.props.fsFileCuid, inputUpdateDto);
-      // if (result) {
-      //   widget.props.state.changeNameChildren(widget.props.fsFileCuid, inputUpdateDto.newFileName);
-      //   return result;
-      // }
+      await widget.stateFire.add(input);
+
       return false;
     } else {
       return false;
@@ -80,7 +81,7 @@ class _AddMedicamentState extends State<AddMedicament> {
                 if (state.isLoading == true && state.isMedException == false) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (state.isMedException == true) {
-                  return warning(label: state.medExceptionMessage, fun: () async => await state.searchMedicaments());
+                  return warning(label: state.medExceptionMessage, fun: () async => await state.loadMedicaments());
                 } else {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 5),
@@ -100,24 +101,70 @@ class _AddMedicamentState extends State<AddMedicament> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // nome medicamento D3DropDownSelectItems
+                                MedDropDownSelectItems<MedicineDto>(
+                                  list: state.getMedicaments?.results ?? [],
+                                  initalSelectedItems: List.of([]),
+                                  label: 'Medicamento Prescrito',
+                                  getLabel: (item) => item.name.toTitleCase(),
+                                  getKey: (item) => item.id,
+                                  getLeadingIcon: (icon) {
+                                    return const Icon(Icons.medication_sharp);
+                                  },
+                                  onSearchRemote: (searchText) async {
+                                    try {
+                                      return await state.searchMedicine(searchText);
+                                    } on Exception catch (e) {
+                                      if (context.mounted) {
+                                        context.showSnackBarError('Erro ao buscar medicamentos: $e');
+                                      }
+                                      return List<MedicineDto>.of([]);
+                                    }
+                                  },
+                                  onItemSelected: (selectedItem) async {
+                                    if (selectedItem.selected.isNotEmpty) {
+                                      input.medicineId = selectedItem.selected.first;
+                                      input.medicineName = selectedItem.item?.name.toTitleCase() ?? '';
+                                    }
+                                  },
+                                  validator: input.isRequired(),
+                                ),
 
-                                // MedDropDownSelectItems<MedicamentBularioDto>(
-                                //   list: state.getMedicaments?.medicaments ?? [],
-                                //   initalSelectedItems: const [],
-                                //   label: 'Medicamento',
-                                //   getLabel: (item) => '${item.nomeComercial} - ${item.principioAtivo}',
-                                //   getKey: (item) => item.id,
-                                //   getLeadingIcon: (icon) {
-                                //     //return GEDocsIcons.icon(icon.active ? "unlock" : "lock");
-                                //     return const Icon(Icons.lock_open);
-                                //   },
-                                //   onItemSelected: (selectedItem) async {},
-                                // ),
+                                const SizedBox(height: 20),
+                                medTextFormField(
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    TextInputFormatter.withFunction((oldValue, newValue) {
+                                      final RegExp regExp = RegExp(r'^-?\d*$');
 
-                                //dosagem () medTextFormField
-
-                                // forma farmaceutica D3DropDownformfield
+                                      if (regExp.hasMatch(newValue.text)) {
+                                        return newValue;
+                                      }
+                                      return oldValue;
+                                    }),
+                                  ],
+                                  labelText: 'Dosagem (ex: 500 mg, 10 mg/mL ou 1 comprimido)',
+                                  onSaved: (newValue) {
+                                    input.dosage = newValue!;
+                                  },
+                                  validator: input.isRequired(),
+                                ),
+                                const SizedBox(height: 20),
+                                medDropdownButtonFormField(
+                                    label: 'Forma Farmacêutica',
+                                    items: _listPharmaceuticalForm.map<DropdownMenuItem<String>>((value) {
+                                      return DropdownMenuItem(
+                                          value: value.key,
+                                          child: Text(value.label,
+                                              overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14)));
+                                    }).toList(),
+                                    onChanged: (String? value) {},
+                                    onSaved: (newValue) {
+                                      if (newValue != null && newValue.isNotEmpty) {
+                                        input.formaFarm = newValue;
+                                      }
+                                    },
+                                    validator: input.isRequired()),
+                                const SizedBox(height: 20),
 
                                 // frequencia (horas) timer medTextFormField
 
@@ -125,37 +172,6 @@ class _AddMedicamentState extends State<AddMedicament> {
 
                                 //observação
 
-                                medTextFormField(
-                                  labelText: 'Nome',
-                                  autofocus: true,
-                                  onSaved: (newValue) {
-                                    input.name = newValue!;
-                                  },
-                                  //validator: inputUpdateDto.isValidName(),
-                                ),
-                                const SizedBox(height: 20),
-                                // if (state.getInfoFile?.scanned == true)
-                                //   Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                //     medDropdownButtonFormField(
-                                //         value: state.getInfoFile?.pageType,
-                                //         label: 'Tipo de página',
-                                //         items: _listItemsPageType.map<DropdownMenuItem<String>>((value) {
-                                //           return DropdownMenuItem(
-                                //               value: value.key,
-                                //               child: Text(value.label,
-                                //                   overflow: TextOverflow.ellipsis,
-                                //                   style: const TextStyle(fontSize: 14)));
-                                //         }).toList(),
-                                //         onChanged: (String? value) {},
-                                //         onSaved: (newValue) {
-                                //           if (newValue != null && newValue.isNotEmpty) {
-                                //             inputUpdateDto.pageType = newValue;
-                                //           }
-                                //         },
-                                //         validator:
-                                //             state.getInfoFile?.scanned == true ? inputUpdateDto.isValidName() : null),
-                                //     const SizedBox(height: 20)
-                                //   ]),
                                 SizedBox(
                                     width: 248,
                                     child: medTextFormField(
@@ -230,16 +246,31 @@ class _AddMedicamentState extends State<AddMedicament> {
                                       //  validator: inputUpdateDto.isValidDate(),
                                     )),
                                 const SizedBox(height: 20),
+                                medTextFormField(
+                                  keyboardType: TextInputType.text,
+                                  labelText: 'Observação',
+                                  maxLines: 4,
+                                  maxLength: 300,
+                                  buildCounter: (context,
+                                      {required currentLength, required isFocused, required maxLength}) {
+                                    return Text("$currentLength/$maxLength", style: const TextStyle(fontSize: 12));
+                                  },
+                                  onSaved: (newValue) {
+                                    input.description = newValue!;
+                                  },
+                                  validator: input.isRequired(),
+                                ),
+                                const SizedBox(height: 20),
                                 SizedBox(
                                     width: double.infinity,
                                     child: MedElevatedButton.primary(
                                       label: 'Salvar',
                                       onPressed: () async {
                                         try {
-                                          var result = await _formUpdateSubmit();
+                                          var result = await _formCreateSubmit();
                                           if (result == true) {
                                             if (!context.mounted) return;
-                                            context.showSnackBarSuccess('Informações atualizada.');
+                                            context.showSnackBarSuccess('Medicamento adicionado.');
                                             if (context.mounted) {
                                               context.pop();
                                             }

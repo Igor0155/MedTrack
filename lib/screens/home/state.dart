@@ -5,8 +5,8 @@ import 'package:meditrack/service/medicament_fire_service.dart';
 
 class MedicamentStateNotifier extends ChangeNotifier {
   final MedicamentFireService _service = MedicamentFireService();
-  List<Medicament> _list = [];
-  List<Medicament> get list => _list;
+  List<MedicamentRepositoryFire> _list = [];
+  List<MedicamentRepositoryFire> get list => _list;
   var isLoading = true;
   var isMedException = false;
 
@@ -18,13 +18,13 @@ class MedicamentStateNotifier extends ChangeNotifier {
     });
   }
 
-  Future<void> add(Medicament m) async {
+  Future<void> add(MedicamentRepositoryFire m) async {
     isLoading = true;
     await _service.adicionarMedicamento(m);
     isLoading = false;
   }
 
-  Future<void> update(Medicament m) async {
+  Future<void> update(MedicamentRepositoryFire m) async {
     isLoading = true;
     await _service.atualizarMedicamento(m);
     isLoading = false;

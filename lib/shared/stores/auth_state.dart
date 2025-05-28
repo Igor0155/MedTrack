@@ -12,7 +12,7 @@ class AuthState {
 class AuthNotifier extends StateNotifier<AuthState> {
   AuthNotifier() : super(AuthState(isAuthenticated: false));
 
-  void login(String token) {
+  void login() {
     state = AuthState(isAuthenticated: true);
   }
 
@@ -20,7 +20,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = AuthState(isAuthenticated: false);
   }
 
-  void changeToken(String token) {
+  void changeToken() {
     state = AuthState(isAuthenticated: false);
 
     state = AuthState(isAuthenticated: true);

@@ -32,3 +32,10 @@ class MedicamentoDto {
     );
   }
 }
+
+class PharmaceuticalForm {
+  String key;
+  String label;
+
+  PharmaceuticalForm({required this.key, required this.label});
+}
