@@ -1,11 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:meditrack/main.dart';
 import 'package:meditrack/screens/home/components/drawer/screen.dart';
 import 'package:meditrack/screens/home/components/listview_medicament.dart';
 import 'package:meditrack/screens/home/state.dart';
 import 'package:meditrack/shared/components/med_appbar.dart';
 import 'package:meditrack/shared/components/no_data.dart';
+import 'package:meditrack/shared/components/snackbar_message.dart';
+import 'package:meditrack/shared/components/warning.dart';
 
 class HomeApp extends ConsumerStatefulWidget {
   const HomeApp({super.key});
@@ -23,14 +28,23 @@ class _HomeAppState extends ConsumerState<HomeApp> {
   @override
   void initState() {
     isTablet = getIt.get<bool>(instanceName: 'isTabletDevice');
+
+    scheduleMicrotask(() async {
+      try {
+        await state.fetchMedicaments();
+      } catch (e) {
+        if (mounted) context.showSnackBarError(e.toString());
+      }
+    });
     super.initState();
   }
 
   Future<void> refresh() async {
-    // await state.refreshNavigate(
-    //   authState.infoToken!.fsRoot!.cuid,
-    //   ref.watch(inputSearchItems.notifier).compareState(),
-    // );
+    try {
+      await state.refresHome();
+    } catch (e) {
+      if (mounted) context.showSnackBarError(e.toString());
+    }
   }
 
   void changeItemCount({required bool isShowCountItems}) {
@@ -59,7 +73,7 @@ class _HomeAppState extends ConsumerState<HomeApp> {
                   width: double.infinity,
                   child: Column(
                     children: [
-                      if (state.list.isEmpty && state.isLoading)
+                      if (state.list != null && state.isLoading)
                         Center(
                           child: Column(
                             children: [
@@ -73,36 +87,27 @@ class _HomeAppState extends ConsumerState<HomeApp> {
                       Expanded(
                         child: Stack(children: [
                           Builder(builder: (context) {
-                            if (state.list.isEmpty && state.isLoading) {
+                            if (state.list == null && state.isMedException == false) {
                               changeItemCount(isShowCountItems: false);
                               return const Center(child: CircularProgressIndicator());
-                            } else if (state.isGEDocsException) {
+                            } else if (state.isMedException) {
                               changeItemCount(isShowCountItems: false);
-                              return SizedBox(); //warning(label: state.gedocsExceptionMessage, fun: () async {});
-                            } else if (state.list.isEmpty) {
+                              return warning(
+                                  label: state.medExceptionMessage,
+                                  fun: () async {
+                                    try {
+                                      await state.fetchMedicaments();
+                                    } catch (e) {
+                                      if (!context.mounted) return;
+                                      context.showSnackBarError(e.toString());
+                                    }
+                                  });
+                            } else if (state.list!.isEmpty) {
                               changeItemCount(isShowCountItems: false);
                               return noData(icon: 'empty');
                             }
                             changeItemCount(isShowCountItems: true);
                             return Column(children: [
-                              Container(
-                                color: Theme.of(context).colorScheme.surface,
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: isTablet ? 20 : 10),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      // selectLayout(
-                                      //   context: context,
-                                      //   selected: <SelectedView>{selectedView},
-                                      //   onSelectionChanged: (Set<SelectedView> newSelection) {
-                                      //     ref.read(viewWorkspace.notifier).changeView(newSelection.first);
-                                      //   },
-                                      // )
-                                    ],
-                                  ),
-                                ),
-                              ),
                               Expanded(
                                   child: RefreshIndicator.adaptive(
                                       backgroundColor: Colors.white,
@@ -127,31 +132,12 @@ class _HomeAppState extends ConsumerState<HomeApp> {
                                         child: Padding(
                                             padding: const EdgeInsets.symmetric(horizontal: 5),
                                             child: Text(
-                                              '${state.list.length}',
+                                              '${state.list?.length ?? 0}',
                                               textAlign: TextAlign.center,
                                               style: const TextStyle(color: Colors.black),
                                             )))),
                               ),
                             ),
-                          // if (state.isLoadingFromOpenFile)
-                          //   Container(
-                          //       width: double.infinity,
-                          //       height: MediaQuery.of(context).size.height,
-                          //       color: Colors.black26,
-                          //       child: Column(
-                          //         mainAxisSize: MainAxisSize.min,
-                          //         mainAxisAlignment: MainAxisAlignment.center,
-                          //         children: [
-                          //           const CircularProgressIndicator.adaptive(),
-                          //           const SizedBox(height: 10),
-                          //           D3ElevatedButton.primary(
-                          //             label: 'Cancelar',
-                          //             onPressed: () {
-                          //               controller.cancelDownload();
-                          //             },
-                          //           ),
-                          //         ],
-                          //       )),
                         ]),
                       ),
                     ],
@@ -163,7 +149,7 @@ class _HomeAppState extends ConsumerState<HomeApp> {
             child: ListenableBuilder(
                 listenable: state,
                 builder: (context, _) {
-                  if (state.isLoading || state.isGEDocsException) {
+                  if (state.isLoading || state.isMedException) {
                     return const SizedBox();
                   } else {
                     return SizedBox(
@@ -172,7 +158,13 @@ class _HomeAppState extends ConsumerState<HomeApp> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           extendedPadding: const EdgeInsets.all(12),
                           onPressed: () async {
-                            // var result = await modalFloatActionButton.primaryModal(context, state);
+                            await context.push('/add_medicament', extra: state);
+                            try {
+                              // Atualiza a lista de medicamentos após adicionar um novo
+                              await state.refresHome();
+                            } catch (e) {
+                              if (context.mounted) context.showSnackBarError(e.toString());
+                            }
                           },
                           label: const Text('Novo'),
                           icon: const Icon(Icons.add)),

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -9,6 +10,11 @@ class FormatDate {
     tz.initializeTimeZones();
     initializeDateFormatting('de_DE');
   }
+
+  DateTime parseBrazilianDateTime(String dateTimeStr) {
+    return DateFormat('dd/MM/yyyy HH:mm:ss').parse(dateTimeStr);
+  }
+
   // Formata a data e hora para o padrão brasileiro
   String formatDateAndTime(String dateTime, [String timeZone = 'America/Sao_Paulo']) {
     DateTime date = DateTime.parse(dateTime);
@@ -34,6 +40,20 @@ class FormatDate {
       String dateFormated = DateFormat.yMd().format(newDate);
 
       return dateFormated;
+    } catch (e) {
+      return date.replaceAll('-', '/');
+    }
+  }
+
+  String formatDateWithTime(String date) {
+    try {
+      DateTime newDate = DateTime.parse(date);
+      Intl.defaultLocale = 'pt_BR';
+      Intl.systemLocale = 'pt_BR';
+
+      String dateFormatted = DateFormat('dd/MM/yyyy HH:mm:ss').format(newDate);
+
+      return dateFormatted;
     } catch (e) {
       return date.replaceAll('-', '/');
     }
@@ -156,5 +176,47 @@ class FormatDate {
         }
       },
     );
+  }
+
+  // Formata o tempo com a máscara HH:mm:ss
+// Formata uma string para o padrão dd/MM/yyyy HH:mm:ss conforme o usuário digita
+  String formatDateTimeWithOnChange(String value) {
+    // Remove tudo que não é dígito
+    value = value.replaceAll(RegExp(r'\D'), '');
+
+    return value.replaceAllMapped(
+      RegExp(r'^(\d{1,2})(\d{0,2})?(\d{0,4})?(\d{0,2})?(\d{0,2})?(\d{0,2})?$'),
+      (Match m) {
+        String result = '';
+
+        if (m[1] != null) result += m[1]!;
+        if (m[2] != null && m[2]!.isNotEmpty) result += '/${m[2]}';
+        if (m[3] != null && m[3]!.isNotEmpty) result += '/${m[3]}';
+        if (m[4] != null && m[4]!.isNotEmpty) result += ' ${m[4]}';
+        if (m[5] != null && m[5]!.isNotEmpty) result += ':${m[5]}';
+        if (m[6] != null && m[6]!.isNotEmpty) result += ':${m[6]}';
+
+        return result;
+      },
+    );
+  }
+
+  /// Recebe um Timestamp do Firestore e retorna a data formatada no padrão brasileiro com horário
+  String formatFirestoreTimestamp(Timestamp timestamp, [String timeZone = 'America/Sao_Paulo']) {
+    // Converte Timestamp para DateTime UTC
+    DateTime dateUtc = timestamp.toDate().toUtc();
+
+    Intl.defaultLocale = 'pt_BR';
+
+    // Pega o timezone
+    final location = tz.getLocation(timeZone);
+
+    // Converte para timezone local
+    final tzDateTime = tz.TZDateTime.from(dateUtc, location);
+
+    // Formata para dd/MM/yyyy HH:mm
+    String formattedDate = DateFormat('dd/MM/yyyy HH:mm').format(tzDateTime);
+
+    return formattedDate;
   }
 }

@@ -19,22 +19,24 @@ class MaterialTheme {
   }
 
   ThemeData _theme(ColorScheme colorScheme) => ThemeData(
-      useMaterial3: true,
-      brightness: colorScheme.brightness,
-      shadowColor: colorScheme.shadow,
-      colorScheme: colorScheme,
-      secondaryHeaderColor: colorScheme.onSecondary,
-      chipTheme: _chipThemeData(colorScheme),
-      checkboxTheme: _checkboxThemeData(colorScheme),
-      textTheme: _textTheme(colorScheme),
-      iconTheme: _iconThemeData(colorScheme),
-      scaffoldBackgroundColor: colorScheme.surface,
-      primaryColor: colorScheme.primary,
-      dividerTheme: _dividerThemeData(colorScheme),
-      inputDecorationTheme: _inputDecorationTheme(colorScheme),
-      appBarTheme: _appBarTheme(colorScheme),
-      floatingActionButtonTheme: _floatingActionButtonThemeData(colorScheme),
-      cardTheme: _cardTheme(colorScheme));
+        useMaterial3: true,
+        brightness: colorScheme.brightness,
+        shadowColor: colorScheme.shadow,
+        colorScheme: colorScheme,
+        secondaryHeaderColor: colorScheme.onSecondary,
+        chipTheme: _chipThemeData(colorScheme),
+        checkboxTheme: _checkboxThemeData(colorScheme),
+        textTheme: _textTheme(colorScheme),
+        iconTheme: _iconThemeData(colorScheme),
+        scaffoldBackgroundColor: colorScheme.surface,
+        primaryColor: colorScheme.primary,
+        dividerTheme: _dividerThemeData(colorScheme),
+        inputDecorationTheme: _inputDecorationTheme(colorScheme),
+        appBarTheme: _appBarTheme(colorScheme),
+        floatingActionButtonTheme: _floatingActionButtonThemeData(colorScheme),
+        cardTheme: _cardTheme(colorScheme),
+        timePickerTheme: _timePickerThemeData(colorScheme),
+      );
 
   ChipThemeData _chipThemeData(ColorScheme colorScheme) => ChipThemeData(
       backgroundColor: colorScheme.tertiaryContainer.withOpacity(0.2),
@@ -74,4 +76,16 @@ class MaterialTheme {
       border: OutlineInputBorder(borderSide: BorderSide(color: colorScheme.tertiaryFixed)),
       enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: colorScheme.outline)),
       focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: colorScheme.tertiaryFixed)));
+
+  TimePickerThemeData _timePickerThemeData(ColorScheme colorScheme) {
+    return TimePickerThemeData(
+      backgroundColor: colorScheme.surface,
+      hourMinuteTextColor: colorScheme.onSurface,
+      hourMinuteColor: colorScheme.tertiaryFixed,
+      dialBackgroundColor: colorScheme.tertiaryContainer,
+      dayPeriodTextColor: colorScheme.onSurface,
+      dayPeriodColor: colorScheme.tertiaryFixed,
+      entryModeIconColor: colorScheme.onSurface,
+    );
+  }
 }

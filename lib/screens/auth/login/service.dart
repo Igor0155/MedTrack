@@ -10,7 +10,7 @@ class ServiceLogin {
   final authConfigState =
       AuthConfigState(client: getIt.get<IClientHttp>(), clientSharedPreferences: getIt.get<IClientSharedPreferences>());
 
-  Future<OutputLoginDto> loginServiceExecute(InputLoginDto inputLoginDto) async {
+  Future<void> loginServiceExecute(InputLoginDto inputLoginDto) async {
     return await loginController.login(inputLoginDto);
   }
 }

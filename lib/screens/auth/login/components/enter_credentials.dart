@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meditrack/main.dart';
 import 'package:meditrack/screens/auth/login/components/switch.dart';
-import 'package:meditrack/shared/components/d3_elevated_button.dart';
+import 'package:meditrack/shared/components/med_elevated_button.dart';
 import 'package:meditrack/shared/components/text_form_field.dart';
 
 class EnterCredentials extends StatefulWidget {
@@ -64,14 +64,14 @@ class _EnterCredentialsState extends State<EnterCredentials> {
                           child: Text('Login', style: TextStyle(fontSize: 14)))),
                   Padding(
                       padding: const EdgeInsets.only(bottom: 20),
-                      child: d3TextFormField(
+                      child: medTextFormField(
                           onSaved: widget.onSavedLogin, labelText: '', validator: widget.validatorLogin)),
                   const Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
                           padding: EdgeInsets.only(left: 5, bottom: 5),
                           child: Text('Senha', style: TextStyle(fontSize: 14)))),
-                  d3TextFormField(
+                  medTextFormField(
                     labelText: '',
                     key: const Key('InputUserPassword'),
                     onSaved: widget.onSavedPassword,
@@ -103,7 +103,7 @@ class _EnterCredentialsState extends State<EnterCredentials> {
                   const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
-                    child: D3ElevatedButton.primary(
+                    child: MedElevatedButton.primary(
                         label: 'Acessar',
                         key: const Key('btnSend'),
                         fontSize: 16,

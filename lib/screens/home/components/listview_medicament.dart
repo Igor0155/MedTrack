@@ -40,9 +40,9 @@ class _ListViewWorkspaceState extends ConsumerState<ListViewMedicament> {
   Widget build(BuildContext context) {
     return ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: widget.state.list.length,
+        itemCount: widget.state.list?.length ?? 0,
         itemBuilder: (context, index) {
-          final children = widget.state.list[index];
+          final children = widget.state.list![index];
           return Container(
             margin: widget.isTablet
                 ? const EdgeInsets.only(left: 28, right: 28, top: 4, bottom: 8)
@@ -114,12 +114,13 @@ class _ListViewWorkspaceState extends ConsumerState<ListViewMedicament> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(children.name,
+                            Text(children.medicineName,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 8),
                             Row(children: [
-                              Text(children.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                              Text(children.medicineName,
+                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                               // children.type == OutputType.fle
                               //     ? Row(children: [
                               //         const SizedBox(width: 8),
@@ -132,7 +133,7 @@ class _ListViewWorkspaceState extends ConsumerState<ListViewMedicament> {
                             const SizedBox(height: 8),
                             Row(
                               children: [
-                                Text(children.fabricator, style: const TextStyle(fontSize: 12)),
+                                Text(children.formaFarm, style: const TextStyle(fontSize: 12)),
                               ],
                             ),
                           ],

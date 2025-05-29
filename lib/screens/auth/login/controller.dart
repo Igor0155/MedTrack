@@ -10,16 +10,14 @@ class LoginController {
   LoginController(this._clientSharedPreferences);
 
   // função para realizar o login e salvar o token e os dados de login(caso o usuário deseje) no localStorage
-  Future<OutputLoginDto> login(InputLoginDto input) async {
+  Future<void> login(InputLoginDto input) async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: input.login,
         password: input.password,
       );
-
-      var token = await FirebaseAuth.instance.currentUser?.getIdToken();
-
-      await _clientSharedPreferences.set("token", token);
+      // Salvando o token no localStorage
+      await saveTokens();
 
       if (input.isSaveInputLogin) {
         final credentials = LocalUserCredentials(u: input.login, p: input.password, n: input.login.split('@')[0]);
@@ -27,9 +25,21 @@ class LoginController {
       } else {
         await _clientSharedPreferences.clean("il");
       }
-      return OutputLoginDto(token: token ?? '');
     } on FirebaseAuthException catch (e) {
-      throw MediTrackException(e.message ?? 'Erro desconhecido no login Firebase');
+      throw MedTrackException(e.message ?? 'Erro desconhecido no login Firebase');
+    }
+  }
+
+  Future<void> saveTokens() async {
+    try {
+      var token = await FirebaseAuth.instance.currentUser?.getIdToken();
+      await _clientSharedPreferences.set("token", token);
+
+      // mock por enquanto, pois a API de medicamentos não tem endpoint de criação de login
+      var tokenMedicine = "bbefb83f13ef75001bb3b0576f1a657fd63cb337";
+      await _clientSharedPreferences.set("tokenMedicine", tokenMedicine);
+    } on Exception catch (e) {
+      throw MedTrackException(e.toString());
     }
   }
 

@@ -25,21 +25,3 @@ class InputLoginDto {
     return FormValidationBuilder().required().minLength(6).build();
   }
 }
-
-class OutputLoginDto {
-  final String token;
-
-  OutputLoginDto({required this.token});
-
-  factory OutputLoginDto.fromJson(Map<String, dynamic> json) {
-    return OutputLoginDto(token: json['token']);
-  }
-
-  bool isValid() {
-    if (token != "") {
-      return true;
-    } else {
-      return false;
-    }
-  }
-}

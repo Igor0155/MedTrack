@@ -21,6 +21,11 @@ Dio createDioInstance(String baseUrl) {
   dio.interceptors.add(InterceptorsWrapper(
     onRequest: (options, handler) async {
       // final clientShared = getIt.get<IClientSharedPreferences>();
+      // String? token = await clientShared.get('token');
+
+      // if (token != null) {
+      //   options.headers["Authorization"] = token;
+      // }
       return handler.next(options);
     },
     onError: (error, handler) {

@@ -8,7 +8,7 @@ Widget noData({String icon = 'no-data', double iconSize = 150, String label = 'N
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(Icons.hourglass_empty),
+          const Icon(Icons.hourglass_empty),
           // GEDocsIcons.icon(icon, width: iconSize),
           const SizedBox(height: 20),
           Text(label),

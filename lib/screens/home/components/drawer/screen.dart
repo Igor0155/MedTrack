@@ -63,34 +63,26 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                     ],
                     decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary)),
                 ExpansionTile(
-                    leading: const Icon(Icons.auto_awesome_mosaic_rounded, size: 20),
+                    leading: const Icon(Icons.api_rounded, size: 20),
                     shape: const Border.symmetric(),
-                    title: const Text('Espaço'),
+                    title: const Text('Remédios'),
                     textColor: Theme.of(context).primaryColor,
                     childrenPadding: const EdgeInsets.only(left: 20),
                     children: [
-                      Tooltip(
-                        message: 'Permissão Necessária',
-                        triggerMode: TooltipTriggerMode.tap,
-                        child: ListTile(
-                            leading: const Icon(Icons.dvr_outlined, size: 20),
-                            title: const Text('Área de Trabalho'),
-                            onTap: () {
-                              context.pushReplacement('/home');
-                            },
-                            minTileHeight: 40),
-                      ),
-                      Tooltip(
-                        message: 'Permissão Necessária',
-                        triggerMode: TooltipTriggerMode.tap,
-                        child: ListTile(
-                            leading: const Icon(Icons.delete, size: 20),
-                            title: const Text('Lixeira'),
-                            onTap: () {
-                              // context.go('/home/trash');
-                            },
-                            minTileHeight: 40),
-                      ),
+                      ListTile(
+                          leading: const Icon(Icons.history, size: 20),
+                          title: const Text('Últimos Medicamentos'),
+                          onTap: () {
+                            context.pushReplacement('/home');
+                          },
+                          minTileHeight: 40),
+                      ListTile(
+                          leading: const Icon(Icons.search, size: 20),
+                          title: const Text('Pesquisar Medicamentos'),
+                          onTap: () {
+                            // context.go('/home/trash');
+                          },
+                          minTileHeight: 40),
                     ]),
               ],
             ),
