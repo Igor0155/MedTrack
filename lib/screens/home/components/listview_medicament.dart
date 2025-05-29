@@ -40,9 +40,9 @@ class _ListViewWorkspaceState extends ConsumerState<ListViewMedicament> {
   Widget build(BuildContext context) {
     return ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: widget.state.list.length,
+        itemCount: widget.state.list?.length ?? 0,
         itemBuilder: (context, index) {
-          final children = widget.state.list[index];
+          final children = widget.state.list![index];
           return Container(
             margin: widget.isTablet
                 ? const EdgeInsets.only(left: 28, right: 28, top: 4, bottom: 8)

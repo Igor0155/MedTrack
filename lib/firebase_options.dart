@@ -65,4 +65,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'meditrack-61d71.firebasestorage.app',
     iosBundleId: 'com.example.meditrack',
   );
+
 }

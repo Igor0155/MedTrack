@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:meditrack/screens/home/type/medicament.dart';
+import 'package:meditrack/service/medicament_fire_service.dart';
 import 'package:meditrack/shared/services/client_http_interface.dart';
 import 'package:meditrack/shared/services/dio_client_medicine.dart';
 import 'package:meditrack/shared/types/api_medicine_response.dart';
 import 'package:meditrack/shared/types/medicines.dart';
 
 class AddMedicamentState with ChangeNotifier {
+  final MedicamentFireService _service = MedicamentFireService();
   final IClientHttp client;
   final DioClientMedicine clientMedicine;
   bool isLoading = true;
@@ -50,6 +52,26 @@ class AddMedicamentState with ChangeNotifier {
       return medicines.results;
     } catch (e) {
       throw Exception("Erro ao buscar medicamentos: $e");
+    }
+  }
+
+  Future<void> createMedicine(MedicamentRepositoryFire input) async {
+    isLoading = true;
+    isMedException = false;
+    medExceptionMessage = '';
+    notifyListeners();
+
+    try {
+      // Adiciona com segurança
+      await _service.adicionarMedicamento(input);
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      isLoading = false;
+      isMedException = true;
+      medExceptionMessage = "Erro ao adicionar medicamento: $e";
+      notifyListeners();
+      rethrow;
     }
   }
 

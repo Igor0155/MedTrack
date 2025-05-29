@@ -1,23 +1,29 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meditrack/shared/form_validator_build/form_validation_builder.dart';
+import 'package:meditrack/shared/helpers/format_date.dart';
 
 class MedicamentRepositoryFire {
-  String authorUid;
-  String id;
-  String medicineName;
-  int medicineId;
-  String dosage;
-  String formaFarm;
-  String duration;
-  String description;
+  String id; // ID do documento no Firestore
+  String authorUid; // ID do usuário que criou o medicamento
+  String description; // Descrição do medicamento
+  String dosage; // Dosagem do medicamento 500 (ex: 500 mg, 10 mg/mL)
+  int dosageIntervalHours; // Intervalo de dosagem em horas ex: 8 (1 comprimido a cada 8 horas)
+  int durationDays; // Duração do tratamento em dias ex: 7( 7 dias)
+  String formaFarm; // Forma farmacêutica (comprimido, cápsula, solução oral, injetável etc.)
+  String medicationStartDatetime; // Data e hora de início do medicamento
+  int medicineId; // ID do medicamento
+  String medicineName; // Nome do medicamento
 
   MedicamentRepositoryFire({
     required this.authorUid,
     required this.id,
     required this.medicineName,
-    required this.medicineId,
     required this.dosage,
+    required this.medicineId,
+    required this.dosageIntervalHours,
     required this.formaFarm,
-    required this.duration,
+    required this.durationDays,
+    required this.medicationStartDatetime,
     required this.description,
   });
 
@@ -26,10 +32,12 @@ class MedicamentRepositoryFire {
       authorUid: json['author_uid'] ?? '',
       id: documentId,
       medicineName: json['name'] ?? '',
-      medicineId: json['medicineId'] ?? '',
+      medicineId: json['medicineId'] ?? 0,
+      medicationStartDatetime: FormatDate().formatFirestoreTimestamp(json['medication_start_datetime'] ?? ''),
       dosage: json['dosage'] ?? '',
+      dosageIntervalHours: json['dosage_interval_hours'] ?? 0,
       formaFarm: json['formaFarm'] ?? '',
-      duration: json['duration'] ?? '',
+      durationDays: json['duration_days'] ?? 0,
       description: json['description'] ?? '',
     );
   }
@@ -39,9 +47,11 @@ class MedicamentRepositoryFire {
       'author_uid': authorUid,
       'name': medicineName,
       'medicineId': medicineId,
+      'dosage_interval_hours': dosageIntervalHours,
+      'medication_start_datetime': Timestamp.fromDate(FormatDate().parseBrazilianDateTime(medicationStartDatetime)),
       'dosage': dosage,
       'formaFarm': formaFarm,
-      'duration': duration,
+      'duration_days': durationDays,
       'description': description,
     };
   }
@@ -51,6 +61,38 @@ class MedicamentRepositoryFire {
   }
 }
 
+enum PharmaceuticalFormEnum {
+  comprimido('CMP', 'Comprimido'),
+  capsula('CAP', 'Cápsula'),
+  solucaoOral('SOL', 'Solução Oral'),
+  injetavel('INJ', 'Injetável'),
+  outro('OUT', 'Outro');
+
+  final String key;
+  final String label;
+
+  const PharmaceuticalFormEnum(this.key, this.label);
+
+  static String? labelFromKey(String key) {
+    for (var form in PharmaceuticalFormEnum.values) {
+      if (form.key == key) return form.label;
+    }
+    return null;
+  }
+}
+
+// // Exemplos de uso:
+
+// void main() {
+//   // Buscar label a partir da key
+//   String? label = PharmaceuticalFormEnum.labelFromKey('CAP');
+//   print(label); // Saída: Cápsula
+
+//   // Listar todas as opções
+//   for (var form in PharmaceuticalFormEnum.values) {
+//     print('${form.key} - ${form.label}');
+//   }
+// }
 
 // 3. Dados da prescrição
 // Nome do medicamento (preferencialmente o nome genérico)

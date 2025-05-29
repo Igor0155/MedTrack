@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:meditrack/main.dart';
 import 'package:meditrack/screens/add_medicament/state.dart';
-import 'package:meditrack/screens/add_medicament/type.dart';
 import 'package:meditrack/screens/home/state.dart';
 import 'package:meditrack/screens/home/type/medicament.dart';
 import 'package:meditrack/shared/components/drop_down_button_formfield.dart';
@@ -32,21 +31,23 @@ class CreateMedicine extends StatefulWidget {
 }
 
 class _CreateMedicineState extends State<CreateMedicine> {
-  final originalDate = TextEditingController();
-  final expectedPurgeDate = TextEditingController();
+  final medicationStartDatetime = TextEditingController();
   final formatDate = FormatDate();
   final pickerCalendar = PickerCalendar();
   final state = AddMedicamentState(client: getIt.get<IClientHttp>(), clientMedicine: getIt.get<DioClientMedicine>());
-  final _listPharmaceuticalForm = [
-    PharmaceuticalForm(key: 'CMP', label: 'Comprimido'),
-    PharmaceuticalForm(key: 'CAP', label: 'Cápsula'),
-    PharmaceuticalForm(key: 'SOL', label: 'Solução Oral'),
-    PharmaceuticalForm(key: 'INJ', label: 'Injetável'),
-    PharmaceuticalForm(key: 'OUT', label: 'Outro'),
-  ]; // Forma farmacêutica (comprimido, cápsula, solução oral, injetável etc.)
   final _formKey = GlobalKey<FormState>();
   final input = MedicamentRepositoryFire(
-      authorUid: "", medicineId: 0, medicineName: '', description: '', dosage: '', duration: '', formaFarm: '', id: '');
+    id: '',
+    authorUid: "",
+    medicineId: 0,
+    medicineName: '',
+    dosageIntervalHours: 0,
+    formaFarm: '',
+    dosage: '',
+    durationDays: 0,
+    medicationStartDatetime: '',
+    description: '',
+  );
 
   @override
   void initState() {
@@ -60,9 +61,9 @@ class _CreateMedicineState extends State<CreateMedicine> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      await widget.stateFire.add(input);
+      await state.createMedicine(input);
 
-      return false;
+      return true;
     } else {
       return false;
     }
@@ -128,7 +129,22 @@ class _CreateMedicineState extends State<CreateMedicine> {
                                   },
                                   validator: input.isRequired(),
                                 ),
-
+                                const SizedBox(height: 20),
+                                medDropdownButtonFormField(
+                                    label: 'Forma Farmacêutica',
+                                    items: PharmaceuticalFormEnum.values.map<DropdownMenuItem<String>>((value) {
+                                      return DropdownMenuItem(
+                                          value: value.key,
+                                          child: Text(value.label,
+                                              overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14)));
+                                    }).toList(),
+                                    onChanged: (String? value) {},
+                                    onSaved: (newValue) {
+                                      if (newValue != null && newValue.isNotEmpty) {
+                                        input.formaFarm = newValue;
+                                      }
+                                    },
+                                    validator: input.isRequired()),
                                 const SizedBox(height: 20),
                                 medTextFormField(
                                   keyboardType: TextInputType.number,
@@ -150,45 +166,72 @@ class _CreateMedicineState extends State<CreateMedicine> {
                                 ),
                                 const SizedBox(height: 20),
                                 medDropdownButtonFormField(
-                                    label: 'Forma Farmacêutica',
-                                    items: _listPharmaceuticalForm.map<DropdownMenuItem<String>>((value) {
-                                      return DropdownMenuItem(
-                                          value: value.key,
-                                          child: Text(value.label,
+                                    label: 'Intervalo de dosagem em horas',
+                                    items: List.generate(24, (index) {
+                                      return DropdownMenuItem<String>(
+                                          value: (index + 1).toString(),
+                                          child: Text('${index + 1} ${index == 0 ? 'hora' : 'horas'}',
                                               overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14)));
-                                    }).toList(),
-                                    onChanged: (String? value) {},
+                                    }),
+                                    onChanged: (String? newValue) {},
                                     onSaved: (newValue) {
-                                      if (newValue != null && newValue.isNotEmpty) {
-                                        input.formaFarm = newValue;
+                                      if (newValue != null && newValue.isNotEmpty && int.tryParse(newValue) != null) {
+                                        input.dosageIntervalHours = int.parse(newValue);
                                       }
                                     },
                                     validator: input.isRequired()),
                                 const SizedBox(height: 20),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 248,
+                                      child: medTextFormField(
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: <TextInputFormatter>[
+                                          TextInputFormatter.withFunction((oldValue, newValue) {
+                                            final RegExp regExp = RegExp(r'^-?\d*$');
 
-                                // frequencia (horas) timer medTextFormField
-
-                                // duração dias timer medTextFormField
-
-                                //observação
-
+                                            if (regExp.hasMatch(newValue.text)) {
+                                              return newValue;
+                                            }
+                                            return oldValue;
+                                          }),
+                                        ],
+                                        labelText: 'Duração do tratamento',
+                                        onSaved: (newValue) {
+                                          if (newValue != null &&
+                                              newValue.isNotEmpty &&
+                                              int.tryParse(newValue) != null) {
+                                            input.durationDays = int.parse(newValue);
+                                          }
+                                        },
+                                        validator: input.isRequired(),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      'Dias',
+                                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 20),
                                 SizedBox(
-                                    width: 248,
+                                    width: 250,
                                     child: medTextFormField(
-                                      labelText: 'Data original',
+                                      labelText: 'Data e hora de início do medicamento',
                                       onSaved: (newValue) {
-                                        // if (newValue != null && originalDate.text.isNotEmpty) {
-                                        //   inputUpdateDto.originalDate =
-                                        //       formatDate.formatStringDateForAmericanStandard(originalDate.text);
-                                        // }
+                                        if (newValue != null && medicationStartDatetime.text.isNotEmpty) {
+                                          input.medicationStartDatetime = medicationStartDatetime.text;
+                                        }
                                       },
                                       onChanged: (value) {
-                                        originalDate.text = formatDate.formatDateWithOnChange(value);
-                                        originalDate.selection =
-                                            TextSelection.fromPosition(TextPosition(offset: originalDate.text.length));
+                                        medicationStartDatetime.text = formatDate.formatDateTimeWithOnChange(value);
+                                        medicationStartDatetime.selection = TextSelection.fromPosition(
+                                            TextPosition(offset: medicationStartDatetime.text.length));
                                       },
                                       keyboardType: TextInputType.datetime,
-                                      controller: originalDate,
+                                      controller: medicationStartDatetime,
                                       buildCounter: (context,
                                               {required currentLength, required isFocused, required maxLength}) =>
                                           const SizedBox(),
@@ -197,53 +240,15 @@ class _CreateMedicineState extends State<CreateMedicine> {
                                           icon: const Icon(Icons.calendar_month_outlined),
                                           onPressed: () async {
                                             var date = await pickerCalendar.pickerCalendar(
-                                                context: context, controller: originalDate);
+                                                isTime: true, context: context, controller: medicationStartDatetime);
                                             if (date != null) {
                                               setState(() {
-                                                originalDate.value =
-                                                    TextEditingValue(text: formatDate.formatDate(date.toString()));
+                                                medicationStartDatetime.value = TextEditingValue(
+                                                    text: formatDate.formatDateWithTime(date.toString()));
                                               });
                                             }
                                           }),
                                       //validator: inputUpdateDto.isValidDate(),
-                                    )),
-                                const SizedBox(height: 20),
-                                SizedBox(
-                                    width: 248,
-                                    child: medTextFormField(
-                                      labelText: 'Data previsão expurgo',
-                                      onSaved: (newValue) {
-                                        // if (newValue != null && expectedPurgeDate.text.isNotEmpty) {
-                                        //   inputUpdateDto.expectedPurgeDate =
-                                        //       formatDate.formatStringDateForAmericanStandard(expectedPurgeDate.text);
-                                        // }
-                                      },
-                                      onChanged: (value) {
-                                        expectedPurgeDate.text = formatDate.formatDateWithOnChange(value);
-                                        expectedPurgeDate.selection = TextSelection.fromPosition(
-                                            TextPosition(offset: expectedPurgeDate.text.length));
-                                      },
-                                      keyboardType: TextInputType.datetime,
-                                      controller: expectedPurgeDate,
-                                      buildCounter: (context,
-                                              {required currentLength, required isFocused, required maxLength}) =>
-                                          const SizedBox(),
-                                      maxLength: 10,
-                                      suffixIcon: IconButton(
-                                          icon: const Icon(Icons.calendar_month_outlined),
-                                          onPressed: () async {
-                                            var date = await pickerCalendar.pickerCalendar(
-                                                context: context,
-                                                controller: expectedPurgeDate,
-                                                firstDate: formatDate.getTomorrowDate());
-                                            if (date != null) {
-                                              setState(() {
-                                                expectedPurgeDate.value =
-                                                    TextEditingValue(text: formatDate.formatDate(date.toString()));
-                                              });
-                                            }
-                                          }),
-                                      //  validator: inputUpdateDto.isValidDate(),
                                     )),
                                 const SizedBox(height: 20),
                                 medTextFormField(
@@ -271,9 +276,7 @@ class _CreateMedicineState extends State<CreateMedicine> {
                                           if (result == true) {
                                             if (!context.mounted) return;
                                             context.showSnackBarSuccess('Medicamento adicionado.');
-                                            if (context.mounted) {
-                                              context.pop();
-                                            }
+                                            if (context.mounted) context.pop();
                                           }
                                         } on MedTrackException catch (e) {
                                           if (!context.mounted) return;
