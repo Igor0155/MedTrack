@@ -204,7 +204,7 @@ class FormatDate {
   /// Recebe um Timestamp do Firestore e retorna a data formatada no padrão brasileiro com horário
   String formatFirestoreTimestamp(Timestamp timestamp, [String timeZone = 'America/Sao_Paulo']) {
     // Converte Timestamp para DateTime UTC
-    DateTime dateUtc = timestamp.toDate().toUtc();
+    DateTime dateUtc = timestamp.toDate().toUtc().add(const Duration(hours: 3));
 
     Intl.defaultLocale = 'pt_BR';
 
