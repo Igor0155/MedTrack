@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:meditrack/screens/home/type/medicament.dart';
 import 'package:meditrack/service/medicament_fire_service.dart';
-import 'package:meditrack/shared/services/client_http_interface.dart';
 import 'package:meditrack/shared/services/dio_client_medicine.dart';
 import 'package:meditrack/shared/types/api_medicine_response.dart';
 import 'package:meditrack/shared/types/medicines.dart';
 
 class AddMedicamentState with ChangeNotifier {
   final MedicamentFireService _service = MedicamentFireService();
-  final IClientHttp client;
   final DioClientMedicine clientMedicine;
   bool isLoading = true;
 
@@ -18,7 +16,7 @@ class AddMedicamentState with ChangeNotifier {
   bool isMedException = false;
   String medExceptionMessage = '';
 
-  AddMedicamentState({required this.client, required this.clientMedicine});
+  AddMedicamentState({required this.clientMedicine});
 
   Future<void> loadMedicaments() async {
     try {

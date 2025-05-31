@@ -17,7 +17,6 @@ import 'package:meditrack/shared/components/text_form_field.dart';
 import 'package:meditrack/shared/components/warning.dart';
 import 'package:meditrack/shared/extensions/to_title_case.dart';
 import 'package:meditrack/shared/helpers/format_date.dart';
-import 'package:meditrack/shared/services/client_http_interface.dart';
 import 'package:meditrack/shared/services/dio_client_medicine.dart';
 import 'package:meditrack/shared/types/exception_type.dart';
 import 'package:meditrack/shared/types/medicines.dart';
@@ -34,7 +33,7 @@ class _CreateMedicineState extends State<CreateMedicine> {
   final medicationStartDatetime = TextEditingController();
   final formatDate = FormatDate();
   final pickerCalendar = PickerCalendar();
-  final state = AddMedicamentState(client: getIt.get<IClientHttp>(), clientMedicine: getIt.get<DioClientMedicine>());
+  final state = AddMedicamentState(clientMedicine: getIt.get<DioClientMedicine>());
   final _formKey = GlobalKey<FormState>();
   final input = MedicamentRepositoryFire(
     id: '',

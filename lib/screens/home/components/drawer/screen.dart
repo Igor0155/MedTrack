@@ -45,7 +45,7 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                     otherAccountsPictures: [
                       IconButton(
                           onPressed: () async {
-                            await context.push('/home/info');
+                            await context.push('/settings');
                             setState(() {});
                           },
                           icon: Icon(Icons.settings, color: Theme.of(context).colorScheme.onPrimary, size: 20)),
@@ -71,16 +71,16 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                     children: [
                       ListTile(
                           leading: const Icon(Icons.history, size: 20),
-                          title: const Text('Últimos Medicamentos'),
+                          title: const Text('Histórico de Remédios'),
                           onTap: () {
-                            context.pushReplacement('/home');
+                            //context.push('/home');
                           },
                           minTileHeight: 40),
                       ListTile(
                           leading: const Icon(Icons.search, size: 20),
-                          title: const Text('Pesquisar Medicamentos'),
+                          title: const Text('Consultar Remédios'),
                           onTap: () {
-                            // context.go('/home/trash');
+                            context.push('/all_medicaments');
                           },
                           minTileHeight: 40),
                     ]),
