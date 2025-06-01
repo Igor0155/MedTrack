@@ -84,6 +84,14 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                           },
                           minTileHeight: 40),
                     ]),
+                ListTile(
+                    leading: const Icon(Icons.search, size: 20),
+                    title: const Text('Consultar Farmácias'),
+                    subtitle: const Text('Encontre farmácias próximas'),
+                    onTap: () {
+                      context.push('/mapa_farmacias');
+                    },
+                    minTileHeight: 40),
               ],
             ),
           ],
@@ -91,4 +99,4 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
   }
 }
 
-///order_specials
+////

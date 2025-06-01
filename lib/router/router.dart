@@ -5,6 +5,7 @@ import 'package:meditrack/screens/auth/login/screen.dart';
 import 'package:meditrack/screens/home/screen.dart';
 import 'package:meditrack/screens/home/settings/screen.dart';
 import 'package:meditrack/screens/home/state.dart';
+import 'package:meditrack/screens/maps/screen.dart';
 import 'package:meditrack/screens/medicines/all/screen.dart';
 import 'package:meditrack/screens/medicines/history/screen.dart';
 
@@ -39,5 +40,10 @@ final GoRouter router = GoRouter(initialLocation: '/', routes: <RouteBase>[
       path: '/settings',
       builder: (BuildContext context, GoRouterState state) {
         return const Settings();
+      }),
+  GoRoute(
+      path: '/mapa_farmacias',
+      builder: (BuildContext context, GoRouterState state) {
+        return const MapaFarmaciasPage();
       }),
 ]);
