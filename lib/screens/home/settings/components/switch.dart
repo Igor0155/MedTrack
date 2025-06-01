@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditrack/shared/stores/theme_mode_app.dart';
-import 'package:meditrack/theme/utils/app_colors.dart';
 
 class SwitchMode extends ConsumerStatefulWidget {
   const SwitchMode({super.key});

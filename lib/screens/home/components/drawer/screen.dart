@@ -73,7 +73,7 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                           leading: const Icon(Icons.history, size: 20),
                           title: const Text('Histórico de Remédios'),
                           onTap: () {
-                            //context.push('/home');
+                            context.push('/history_medicaments');
                           },
                           minTileHeight: 40),
                       ListTile(

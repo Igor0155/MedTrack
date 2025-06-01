@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:meditrack/screens/medicines/all/components/item_list.dart';
+import 'package:meditrack/screens/medicines/components/item_list.dart';
 import 'package:meditrack/shared/custom_clipper/bottom_clipper.dart';
 import 'package:meditrack/shared/custom_clipper/custom_clipper.dart';
 import 'package:meditrack/shared/types/medicine_presentation.dart';

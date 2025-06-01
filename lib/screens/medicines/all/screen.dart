@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:meditrack/main.dart';
-import 'package:meditrack/screens/medicines/all/components/details.dart';
-import 'package:meditrack/screens/medicines/all/components/item_list.dart';
-import 'package:meditrack/screens/medicines/all/components/search.dart';
+import 'package:meditrack/screens/medicines/components/details.dart';
+import 'package:meditrack/screens/medicines/components/item_list.dart';
+import 'package:meditrack/screens/medicines/components/search.dart';
 import 'package:meditrack/screens/medicines/all/state.dart';
 import 'package:meditrack/shared/custom_clipper/bottom_clipper.dart';
 import 'package:meditrack/shared/components/med_appbar.dart';
@@ -84,7 +84,7 @@ class _AllMedicamentsScreenState extends State<AllMedicamentsScreen> {
                       child: CircularProgressIndicator(),
                     );
                   } else if (state.medicines?.results.isEmpty ?? false) {
-                    return noData(icon: 'empty-data', iconSize: 100, label: 'Não há clientes');
+                    return noData(icon: 'empty-data', iconSize: 100, label: 'Não há medicamentos cadastrados');
                   } else if (state.medException) {
                     return warning(label: state.medExceptionMessage, fun: () async => await state.searchMedicine());
                   }

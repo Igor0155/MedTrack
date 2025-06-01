@@ -29,6 +29,16 @@ class MedicamentFireService {
     return medicamentos;
   }
 
+  Future<List<int>> buscarTodosMedicamentosIds() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) throw Exception("Usuário não autenticado.");
+
+    final snapshot = await _medicamentRef.where('author_uid', isEqualTo: uid).get();
+    return snapshot.docs
+        .map((doc) => MedicamentRepositoryFire.fromJson(doc.data() as Map<String, dynamic>, doc.id).medicineId)
+        .toList();
+  }
+
   Future<MedicamentRepositoryFire?> buscarMedicamentoPorId(String id) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) throw Exception("Usuário não autenticado.");

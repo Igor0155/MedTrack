@@ -1,26 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:meditrack/service/medicament_fire_service.dart';
 import 'package:meditrack/shared/services/dio_client_medicine.dart';
 import 'package:meditrack/shared/types/api_medicine_response.dart';
 import 'package:meditrack/shared/types/medicine_presentation.dart';
 
-class StateSelectMedicine with ChangeNotifier {
+class StateHistoryMedicine with ChangeNotifier {
+  final _service = MedicamentFireService();
   final DioClientMedicine clientMedicine;
-  bool isLoading = true;
+  var isLoading = true;
   late bool medException;
   late String medExceptionMessage;
 
   ApiMedicineResponse<MedicinePresentation>? _medicines;
   ApiMedicineResponse<MedicinePresentation>? get medicines => _medicines;
 
-  StateSelectMedicine({required this.clientMedicine});
+  StateHistoryMedicine({required this.clientMedicine});
 
-  Future<void> searchMedicine() async {
+  Future<void> loadingMedicine() async {
     try {
       medExceptionMessage = '';
       isLoading = true;
       medException = false;
       notifyListeners();
-      var response = await clientMedicine.get('/v1/apresentacao-medicamentos/?page_size=200');
+      var listIdsMedicine = await _service.buscarTodosMedicamentosIds();
+
+      // Transforma a lista de ints em uma string do tipo "?medicamento=3&medicamento=32"
+      String query = listIdsMedicine.isNotEmpty ? '?${listIdsMedicine.map((m) => 'medicamento=$m').join('&')}' : '';
+
+      if (query.isEmpty) {
+        isLoading = false;
+        notifyListeners();
+        return;
+      }
+
+      var response = await clientMedicine.get('/v1/apresentacao-medicamentos/$query');
 
       _medicines = ApiMedicineResponse<MedicinePresentation>.fromJson(
         response.data,

@@ -6,6 +6,7 @@ import 'package:meditrack/screens/home/screen.dart';
 import 'package:meditrack/screens/home/settings/screen.dart';
 import 'package:meditrack/screens/home/state.dart';
 import 'package:meditrack/screens/medicines/all/screen.dart';
+import 'package:meditrack/screens/medicines/history/screen.dart';
 
 final GoRouter router = GoRouter(initialLocation: '/', routes: <RouteBase>[
   GoRoute(
@@ -28,6 +29,11 @@ final GoRouter router = GoRouter(initialLocation: '/', routes: <RouteBase>[
       path: '/all_medicaments',
       builder: (BuildContext context, GoRouterState state) {
         return const AllMedicamentsScreen();
+      }),
+  GoRoute(
+      path: '/history_medicaments',
+      builder: (BuildContext context, GoRouterState state) {
+        return const HistoryMedicamentsScreen();
       }),
   GoRoute(
       path: '/settings',
