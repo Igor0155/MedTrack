@@ -27,9 +27,9 @@ class BlueScheme {
   static MaterialScheme darkBlueScheme() {
     return const MaterialScheme(
       brightness: Brightness.dark,
-      primary: Color(0xFF25D366), // azul principal
+      primary: Color(0xff426642), // azul principal
       onPrimary: Color(0xffFFFFFF), // texto escuro em fundo claro
-      secondary: Color(0xFF128C7E), // azul forte
+      secondary: Color(0xff1A3746), // azul forte
       onSecondary: Color(0xffDBDBDB),
       tertiaryFixed: Color(0xFFDCF8C6),
       onTertiary: Color(0xffF7F7F7),
@@ -39,7 +39,7 @@ class BlueScheme {
       error: Color(0xffED4343), // vermelho de erro
       onError: Color(0xFF0C1034),
       blueGreyLight: Color(0xffDAEBFF),
-      surface: Color(0xff343740), // fundo escuro para superfícies
+      surface: Color(0xff0B1E28), // fundo escuro para superfícies
       onSurface: Color(0xffCEDEF2), // texto claro
       outline: Color(0xFFB0B4BA), // contornos mais suaves em tons claros
       shadow: Color(0xffffffff),

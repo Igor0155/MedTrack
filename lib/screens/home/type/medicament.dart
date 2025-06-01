@@ -59,6 +59,10 @@ class MedicamentRepositoryFire {
   StringValidationCallback isRequired() {
     return FormValidationBuilder().required().build();
   }
+
+  StringValidationCallback isValidDate() {
+    return FormValidationBuilder().required().dateTime().build();
+  }
 }
 
 enum PharmaceuticalFormEnum {

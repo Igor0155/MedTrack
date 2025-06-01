@@ -17,7 +17,6 @@ import 'package:meditrack/shared/components/text_form_field.dart';
 import 'package:meditrack/shared/components/warning.dart';
 import 'package:meditrack/shared/extensions/to_title_case.dart';
 import 'package:meditrack/shared/helpers/format_date.dart';
-import 'package:meditrack/shared/services/client_http_interface.dart';
 import 'package:meditrack/shared/services/dio_client_medicine.dart';
 import 'package:meditrack/shared/types/exception_type.dart';
 import 'package:meditrack/shared/types/medicines.dart';
@@ -34,7 +33,7 @@ class _CreateMedicineState extends State<CreateMedicine> {
   final medicationStartDatetime = TextEditingController();
   final formatDate = FormatDate();
   final pickerCalendar = PickerCalendar();
-  final state = AddMedicamentState(client: getIt.get<IClientHttp>(), clientMedicine: getIt.get<DioClientMedicine>());
+  final state = AddMedicamentState(clientMedicine: getIt.get<DioClientMedicine>());
   final _formKey = GlobalKey<FormState>();
   final input = MedicamentRepositoryFire(
     id: '',
@@ -86,15 +85,15 @@ class _CreateMedicineState extends State<CreateMedicine> {
                 } else {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 5),
-                    child: Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                      Container(
-                          decoration: const BoxDecoration(boxShadow: [
-                            BoxShadow(color: Colors.black, offset: Offset(1, 1), blurRadius: 3, spreadRadius: 0.1),
-                            BoxShadow(color: Colors.grey, offset: Offset(1, 1), blurRadius: 2, spreadRadius: 0.3)
-                          ]),
-                          child: const Divider(height: 0)),
-                      Expanded(
-                        child: Container(
+                    child: SingleChildScrollView(
+                      child: Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+                        Container(
+                            decoration: const BoxDecoration(boxShadow: [
+                              BoxShadow(color: Colors.black, offset: Offset(1, 1), blurRadius: 3, spreadRadius: 0.1),
+                              BoxShadow(color: Colors.grey, offset: Offset(1, 1), blurRadius: 2, spreadRadius: 0.3)
+                            ]),
+                            child: const Divider(height: 0)),
+                        Container(
                           constraints: const BoxConstraints(maxWidth: 600),
                           padding: const EdgeInsets.only(top: 20, left: 15, right: 15),
                           child: Form(
@@ -248,7 +247,7 @@ class _CreateMedicineState extends State<CreateMedicine> {
                                               });
                                             }
                                           }),
-                                      //validator: inputUpdateDto.isValidDate(),
+                                      validator: input.isValidDate(),
                                     )),
                                 const SizedBox(height: 20),
                                 medTextFormField(
@@ -263,7 +262,6 @@ class _CreateMedicineState extends State<CreateMedicine> {
                                   onSaved: (newValue) {
                                     input.description = newValue!;
                                   },
-                                  validator: input.isRequired(),
                                 ),
                                 const SizedBox(height: 20),
                                 SizedBox(
@@ -289,8 +287,8 @@ class _CreateMedicineState extends State<CreateMedicine> {
                             ),
                           ),
                         ),
-                      ),
-                    ]),
+                      ]),
+                    ),
                   );
                 }
               },

@@ -63,6 +63,21 @@ extension CustomValidationBuild on FormValidationBuilder {
     });
   }
 
+  FormValidationBuilder dateTime([String? message]) {
+    return add((value) {
+      // Expressão regular para DD/MM/AAAA HH:MM:SS
+      final dateTimeRegex = RegExp(r'^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/\d{4} ' // Data
+          r'([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$' // Hora
+          );
+
+      if (value == null || value.isEmpty) return null;
+
+      return !dateTimeRegex.hasMatch(value)
+          ? message ?? 'Data e hora inválidas, use o formato DD/MM/AAAA HH:MM:SS'
+          : null;
+    });
+  }
+
   FormValidationBuilder isRequiredWhenBothFieldsAreEmpty(List<String> valueToCompare1, List<String> valueToCompare2,
       [String? message]) {
     return add((value) {
