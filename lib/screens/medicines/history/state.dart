@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meditrack/service/medicament_fire_service.dart';
 import 'package:meditrack/shared/services/dio_client_medicine.dart';
-import 'package:meditrack/shared/types/api_medicine_response.dart';
-import 'package:meditrack/shared/types/medicine_presentation.dart';
+import 'package:meditrack/shared/types/medicines.dart';
 
 class StateHistoryMedicine with ChangeNotifier {
   final _service = MedicamentFireService();
@@ -11,8 +10,8 @@ class StateHistoryMedicine with ChangeNotifier {
   late bool medException;
   late String medExceptionMessage;
 
-  ApiMedicineResponse<MedicinePresentation>? _medicines;
-  ApiMedicineResponse<MedicinePresentation>? get medicines => _medicines;
+  List<MedicineDto>? _medicines;
+  List<MedicineDto>? get medicines => _medicines;
 
   StateHistoryMedicine({required this.clientMedicine});
 
@@ -22,24 +21,15 @@ class StateHistoryMedicine with ChangeNotifier {
       isLoading = true;
       medException = false;
       notifyListeners();
-      var listIdsMedicine = await _service.buscarTodosMedicamentosIds();
+      var listIdsMedicine = (await _service.buscarTodosMedicamentosIds()).toSet().toList();
 
-      // Transforma a lista de ints em uma string do tipo "?medicamento=3&medicamento=32"
-      String query = listIdsMedicine.isNotEmpty ? '?${listIdsMedicine.map((m) => 'medicamento=$m').join('&')}' : '';
-
-      if (query.isEmpty) {
-        isLoading = false;
-        notifyListeners();
-        return;
+      List<MedicineDto> list = List.of([]);
+      for (var i in listIdsMedicine) {
+        var response = await clientMedicine.get('/v1/medicamentos/$i/');
+        list.add(MedicineDto.fromJson(response.data));
       }
 
-      var response = await clientMedicine.get('/v1/apresentacao-medicamentos/$query');
-
-      _medicines = ApiMedicineResponse<MedicinePresentation>.fromJson(
-        response.data,
-        (json) => MedicinePresentation.fromJson(json),
-      );
-
+      _medicines = list;
       isLoading = false;
       notifyListeners();
     } catch (e) {
