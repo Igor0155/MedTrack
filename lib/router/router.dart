@@ -44,6 +44,6 @@ final GoRouter router = GoRouter(initialLocation: '/', routes: <RouteBase>[
   GoRoute(
       path: '/mapa_farmacias',
       builder: (BuildContext context, GoRouterState state) {
-        return const MapaFarmaciasPage();
+        return const PharmacyMapScreen();
       }),
 ]);

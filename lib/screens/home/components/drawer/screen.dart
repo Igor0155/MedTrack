@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +14,20 @@ class HomeDrawer extends ConsumerStatefulWidget {
 class _HomeDrawerState extends ConsumerState<HomeDrawer> {
   final isTablet = getIt.get<bool>(instanceName: 'isTabletDevice');
 
+  User? user;
+
+  @override
+  void initState() {
+    super.initState();
+    try {
+      // Verifica se o usuário está autenticado
+      user = FirebaseAuth.instance.currentUser;
+    } catch (e) {
+      // Se ocorrer um erro, o usuário será nulo
+      user = null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -25,22 +40,29 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                 UserAccountsDrawerHeader(
                     accountName: Padding(
                         padding: const EdgeInsets.only(right: 20),
-                        child: Text("teste", style: TextStyle(color: Theme.of(context).colorScheme.onPrimary))),
+                        child: Text(
+                            user?.displayName?.isNotEmpty == true
+                                ? user!.displayName!
+                                : user?.email?.split('@').first.toUpperCase() ?? 'Usuário não encontrado',
+                            style: TextStyle(color: Theme.of(context).colorScheme.onPrimary))),
                     accountEmail: Padding(
                       padding: const EdgeInsets.only(right: 20),
                       child: Row(
                         children: [
-                          Text('Cliente: ',
+                          Text('E-mail: ',
                               style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                               overflow: TextOverflow.ellipsis),
                           Expanded(
-                              child: Text("verificar se vai ficar",
+                              child: Text(user?.email ?? 'Não encontrado',
                                   style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                                   overflow: TextOverflow.ellipsis))
                         ],
                       ),
                     ),
-                    currentAccountPicture: const Text('-'),
+                    currentAccountPicture: CircleAvatar(
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
+                      child: const Icon(Icons.person, size: 40, color: Colors.white),
+                    ),
                     currentAccountPictureSize: const Size(60, 60),
                     otherAccountsPictures: [
                       IconButton(
@@ -50,15 +72,7 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                           },
                           icon: Icon(Icons.settings, color: Theme.of(context).colorScheme.onPrimary, size: 20)),
                       IconButton(
-                          onPressed: () async {
-                            // ref.read(authProvider.notifier).logout();
-                            // ref.read(inputSearchItems.notifier).cleanSearch();
-                            // ref.read(d3CanProvider.notifier).clearAllPermissions();
-                            // await service.logout();
-                            // if (context.mounted) {
-                            //   context.go('/auth_login');
-                            // }
-                          },
+                          onPressed: () => context.go('/'),
                           icon: Icon(Icons.logout, size: 20, color: Theme.of(context).colorScheme.onPrimary))
                     ],
                     decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary)),
