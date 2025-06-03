@@ -5,9 +5,11 @@ import 'package:meditrack/screens/home/details_medicine/screen.dart';
 import 'package:meditrack/screens/home/type/medicament.dart';
 import 'package:meditrack/theme/utils/app_colors.dart';
 
+enum TypeModalOptions { edit, delete }
+
 class ShowModalOptions {
-  Future<void> modalViewOptions(MedicamentRepositoryFire children, BuildContext context) {
-    return showModalBottomSheet<void>(
+  Future<TypeModalOptions?> modalViewOptions(MedicamentRepositoryFire children, BuildContext context) {
+    return showModalBottomSheet<TypeModalOptions?>(
         isScrollControlled: true,
         useSafeArea: true,
         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
@@ -50,10 +52,7 @@ class ShowModalOptions {
                         title: const Text('Detalhes do medicamento', style: TextStyle(fontSize: 14))),
                     ListTile(
                       onTap: () {
-                        // context.push('/home/move-to-trash',
-                        //     extra: PropsMoveToTrash(
-                        //         cuids: List.of([children.cuid]), state: state, isFle: children.type == OutputType.fle));
-                        // context.pop();
+                        context.pop(TypeModalOptions.delete);
                       },
                       leading: Icon(color: AppColors.redError, Icons.delete, size: 20),
                       title: Text(

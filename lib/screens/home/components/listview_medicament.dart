@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditrack/screens/home/components/modal_options.dart';
 import 'package:meditrack/screens/home/state.dart';
+import 'package:meditrack/shared/components/snackbar_message.dart';
 
 class ListViewMedicament extends ConsumerStatefulWidget {
   final MedicamentStateNotifier state;
@@ -52,7 +53,26 @@ class _ListViewWorkspaceState extends ConsumerState<ListViewMedicament> {
               child: InkWell(
                 borderRadius: BorderRadius.circular(10),
                 onTap: () async {
-                  await ShowModalOptions().modalViewOptions(children, context);
+                  var result = await ShowModalOptions().modalViewOptions(children, context);
+                  if (result == null || !context.mounted) return;
+                  if (result == TypeModalOptions.delete) {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Confirmação'),
+                        content: Text('Tem certeza que deseja remover ${children.medicineName}?'),
+                        actions: [
+                          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancelar')),
+                          TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Remover')),
+                        ],
+                      ),
+                    );
+                    if (confirm != true || !context.mounted) return;
+                    await widget.state.remove(children);
+                    if (!context.mounted) return;
+
+                    context.showSnackBarSuccess("Medicamento ${children.medicineName} removido com sucesso!");
+                  }
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
@@ -86,15 +106,7 @@ class _ListViewWorkspaceState extends ConsumerState<ListViewMedicament> {
                           ],
                         ),
                       ),
-                      IconButton(
-                          onPressed: () async {
-                            await ShowModalOptions().modalViewOptions(children, context);
-                          },
-                          icon: const Icon(
-                            Icons.restore,
-                            size: 32,
-                            color: Colors.redAccent,
-                          ))
+                      const Icon(Icons.restore, size: 32, color: Colors.redAccent)
                     ],
                   ),
                 ),

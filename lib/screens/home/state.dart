@@ -35,6 +35,16 @@ class MedicamentStateNotifier extends ChangeNotifier {
     await fetchMedicaments();
   }
 
+  Future<void> remove(MedicamentRepositoryFire medicament) async {
+    try {
+      await _service.deletarMedicamento(medicament.id);
+      _list?.remove(medicament);
+      notifyListeners();
+    } catch (e) {
+      throw Exception('Erro ao remover medicamento: $e');
+    }
+  }
+
   // Future<void> add(MedicamentRepositoryFire m) async {
   //   isLoading = true;
   //   await _service.adicionarMedicamento(m);
