@@ -5,7 +5,10 @@ import 'package:get_it/get_it.dart';
 import 'package:meditrack/app/app_meditrack.dart';
 import 'package:meditrack/firebase_options.dart';
 import 'package:meditrack/shared/helpers/device_type.dart';
+import 'package:meditrack/shared/stores/local_notifications.dart';
 import 'package:meditrack/shared/stores/theme_mode_app.dart';
+import 'package:timezone/data/latest.dart' as tz; // Para fuso horário nas notificações
+import 'package:timezone/timezone.dart' as tz;
 
 class InitializationWidget extends ConsumerWidget {
   final GetIt getIt;
@@ -28,6 +31,10 @@ class InitializationWidget extends ConsumerWidget {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
+
+      tz.initializeTimeZones();
+
+      await NotificationService().initNotifications();
 
       // Inicia o aplicativo principal
       runApp(const ProviderScope(child: MediTrack()));

@@ -2,9 +2,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:meditrack/screens/home/type/medicament.dart';
 import 'package:meditrack/service/medicament_fire_service.dart';
+import 'package:meditrack/shared/stores/local_notifications.dart';
 
 class MedicamentStateNotifier extends ChangeNotifier {
   final MedicamentFireService _service = MedicamentFireService();
+  final NotificationService _notificationService = NotificationService();
   List<MedicamentRepositoryFire>? _list;
   List<MedicamentRepositoryFire>? get list => _list;
   var isLoading = true;
@@ -18,6 +20,9 @@ class MedicamentStateNotifier extends ChangeNotifier {
       isLoading = true;
       notifyListeners();
       _list = await _service.buscarMedicamentos();
+
+      await scheduleNotification();
+
       isLoading = false;
       notifyListeners();
     } catch (e) {
@@ -45,21 +50,28 @@ class MedicamentStateNotifier extends ChangeNotifier {
     }
   }
 
-  // Future<void> add(MedicamentRepositoryFire m) async {
-  //   isLoading = true;
-  //   await _service.adicionarMedicamento(m);
-  //   isLoading = false;
-  // }
-
-  // Future<void> update(MedicamentRepositoryFire m) async {
-  //   isLoading = true;
-  //   await _service.atualizarMedicamento(m);
-  //   isLoading = false;
-  // }
-
-  // Future<void> delete(String id) async {
-  //   isLoading = true;
-  //   await _service.deletarMedicamento(id);
-  //   isLoading = false;
-  // }
+  Future<void> scheduleNotification() async {
+    try {
+      await _notificationService.cancelAllNotifications(); // OU um método mais específico
+      if (_list != null) {
+        for (var medRepo in _list!) {
+          final MedicamentRepositoryFire medication = MedicamentRepositoryFire(
+            id: medRepo.id,
+            authorUid: medRepo.authorUid,
+            description: medRepo.description,
+            dosage: medRepo.dosage,
+            dosageIntervalHours: medRepo.dosageIntervalHours,
+            durationDays: medRepo.durationDays,
+            formaFarm: medRepo.formaFarm,
+            medicationStartDatetime: medRepo.medicationStartDatetime,
+            medicineId: medRepo.medicineId,
+            medicineName: medRepo.medicineName,
+          );
+          await _notificationService.scheduleMedicationNotifications(medication);
+        }
+      }
+    } catch (e) {
+      throw Exception('Erro ao agendar notificação: $e');
+    }
+  }
 }

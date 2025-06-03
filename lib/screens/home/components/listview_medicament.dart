@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditrack/screens/home/components/modal_options.dart';
 import 'package:meditrack/screens/home/state.dart';
 import 'package:meditrack/shared/components/snackbar_message.dart';
+import 'package:meditrack/shared/stores/local_notifications.dart';
 
 class ListViewMedicament extends ConsumerStatefulWidget {
   final MedicamentStateNotifier state;
@@ -14,16 +15,22 @@ class ListViewMedicament extends ConsumerStatefulWidget {
 }
 
 class _ListViewWorkspaceState extends ConsumerState<ListViewMedicament> {
-  @override
-  void initState() {
-    super.initState();
-    // widget.scrollController.addListener(() {
-    //   if (widget.scrollController.position.pixels >= widget.scrollController.position.maxScrollExtent &&
-    //       widget.state.info!.children.length < widget.state.info!.totalChildren) {
-    //     widget.scrollController.animateTo(widget.scrollController.position.pixels + 50,
-    //         duration: const Duration(milliseconds: 50), curve: Curves.easeInOut);
-    //   }
-    // });
+  final NotificationService _notificationService = NotificationService();
+
+  String _formatDuration(Duration? duration) {
+    if (duration == null) {
+      return 'Tratamento Concluído';
+    }
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    String twoDigitHours = twoDigits(duration.inHours.remainder(24));
+    if (duration.inDays > 0) {
+      return '${duration.inDays}d ${twoDigitHours}h ${twoDigitMinutes}m';
+    } else if (duration.inHours > 0) {
+      return '${twoDigitHours}h ${twoDigitMinutes}m';
+    } else {
+      return '${twoDigits(duration.inSeconds.remainder(60))}s';
+    }
   }
 
   @override
@@ -32,7 +39,8 @@ class _ListViewWorkspaceState extends ConsumerState<ListViewMedicament> {
         physics: const AlwaysScrollableScrollPhysics(),
         itemCount: widget.state.list?.length ?? 0,
         itemBuilder: (context, index) {
-          final children = widget.state.list![index];
+          final medication = widget.state.list![index];
+          final timeUntilNextDose = _notificationService.getTimeUntilNextDose(medication);
           return Container(
             margin: widget.isTablet
                 ? const EdgeInsets.only(left: 28, right: 28, top: 4, bottom: 8)
@@ -53,14 +61,14 @@ class _ListViewWorkspaceState extends ConsumerState<ListViewMedicament> {
               child: InkWell(
                 borderRadius: BorderRadius.circular(10),
                 onTap: () async {
-                  var result = await ShowModalOptions().modalViewOptions(children, context);
+                  var result = await ShowModalOptions().modalViewOptions(medication, context);
                   if (result == null || !context.mounted) return;
                   if (result == TypeModalOptions.delete) {
                     final confirm = await showDialog<bool>(
                       context: context,
                       builder: (context) => AlertDialog(
                         title: const Text('Confirmação'),
-                        content: Text('Tem certeza que deseja remover ${children.medicineName}?'),
+                        content: Text('Tem certeza que deseja remover ${medication.medicineName}?'),
                         actions: [
                           TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancelar')),
                           TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Remover')),
@@ -68,10 +76,10 @@ class _ListViewWorkspaceState extends ConsumerState<ListViewMedicament> {
                       ),
                     );
                     if (confirm != true || !context.mounted) return;
-                    await widget.state.remove(children);
+                    await widget.state.remove(medication);
                     if (!context.mounted) return;
 
-                    context.showSnackBarSuccess("Medicamento ${children.medicineName} removido com sucesso!");
+                    context.showSnackBarSuccess("Medicamento ${medication.medicineName} removido com sucesso!");
                   }
                 },
                 child: Padding(
@@ -83,26 +91,20 @@ class _ListViewWorkspaceState extends ConsumerState<ListViewMedicament> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(children.medicineName,
+                            Text(medication.medicineName,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 8),
-                            Row(children: [
-                              Text(children.medicineName,
-                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                              // Row(children: [
-                              //   const SizedBox(width: 8),
-                              //   true
-                              //       ? const Icon(Icons.cloud_done, size: 16, color: Colors.lightBlueAccent)
-                              //       : const Icon(Icons.cloud_sync, color: Colors.redAccent, size: 16)
-                              // ])
-                            ]),
+                            Text(medication.medicineName,
+                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Text(children.formaFarm, style: const TextStyle(fontSize: 12)),
-                              ],
-                            ),
+                            Text(medication.formaFarm, style: const TextStyle(fontSize: 12)),
+                            if (timeUntilNextDose != null)
+                              Text('Próxima dose em: ${_formatDuration(timeUntilNextDose)}',
+                                  style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.blue))
+                            else
+                              const Text('Tratamento concluído ou não iniciado.',
+                                  style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey)),
                           ],
                         ),
                       ),
