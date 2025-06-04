@@ -84,29 +84,3 @@ enum PharmaceuticalFormEnum {
     return null;
   }
 }
-
-// // Exemplos de uso:
-
-// void main() {
-//   // Buscar label a partir da key
-//   String? label = PharmaceuticalFormEnum.labelFromKey('CAP');
-//   print(label); // Saída: Cápsula
-
-//   // Listar todas as opções
-//   for (var form in PharmaceuticalFormEnum.values) {
-//     print('${form.key} - ${form.label}');
-//   }
-// }
-
-// 3. Dados da prescrição
-// Nome do medicamento (preferencialmente o nome genérico)
-
-// Dosagem (ex: 500 mg, 10 mg/mL)
-
-// Forma farmacêutica (comprimido, cápsula, solução oral, injetável etc.)
-
-// Posologia (quantidade, frequência e duração: ex: "1 comprimido de 8 em 8 horas por 7 dias")
-
-// Via de administração (oral, intramuscular, intravenosa, tópica etc.)
-
-// Quantidade total a ser fornecida (em especial para antibióticos e controlados)
