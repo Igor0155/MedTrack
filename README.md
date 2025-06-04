@@ -1,4 +1,4 @@
-# meditrack
+# medtrack
 _
 A new Flutter project.
 
